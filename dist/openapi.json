@@ -345,7 +345,11 @@
           "meta": {
             "$ref": "#/components/schemas/Meta"
           }
-        }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       }
     }
   }

@@ -4,7 +4,7 @@
   "description": "Interface contract specs for LegionIO — OpenAPI, AMQP, DB, MCP.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx @redocly/cli lint api/openapi.yaml"
   },
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/LegionIO/legionio-spec/issues"

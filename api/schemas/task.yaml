@@ -23,7 +23,7 @@ TaskObject:
       type: string
       format: date-time
     metering:
-      $ref: '#/TaskMetering'
+      $ref: './task.yaml#/TaskMetering'
   required:
     - id
     - function_id
@@ -102,7 +102,7 @@ TaskResponse:
   type: object
   properties:
     data:
-      $ref: '#/TaskObject'
+      $ref: './task.yaml#/TaskObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -115,7 +115,7 @@ TaskCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/TaskObject'
+        $ref: './task.yaml#/TaskObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:
@@ -153,24 +153,28 @@ TaskLogCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/TaskLogObject'
+        $ref: './task.yaml#/TaskLogObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:
     - data
     - meta
 
+TaskCreatedObject:
+  type: object
+  description: Task creation result returned by Ingress.
+  properties:
+    task_id:
+      type: integer
+      example: 42
+  additionalProperties: true
+
 TaskCreatedResponse:
   type: object
   description: Response from POST /api/tasks — task_id and status from Ingress
   properties:
     data:
-      type: object
-      additionalProperties: true
-      properties:
-        task_id:
-          type: integer
-          example: 42
+      $ref: './task.yaml#/TaskCreatedObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:

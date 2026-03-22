@@ -27,7 +27,7 @@ NodeResponse:
   type: object
   properties:
     data:
-      $ref: '#/NodeObject'
+      $ref: './node.yaml#/NodeObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -40,7 +40,7 @@ NodeCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/NodeObject'
+        $ref: './node.yaml#/NodeObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:

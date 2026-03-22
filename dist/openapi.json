@@ -350,6 +350,1033 @@
           "data",
           "meta"
         ]
+      },
+      "TaskObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "function_id": {
+            "type": "integer",
+            "example": 7
+          },
+          "status": {
+            "type": "string",
+            "example": "complete"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "worker_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "worker-abc123"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metering": {
+            "$ref": "#/components/schemas/TaskMetering"
+          }
+        },
+        "required": [
+          "id",
+          "function_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "TaskMetering": {
+        "type": "object",
+        "description": "Aggregated LLM token usage for this task. Present only when metering records exist.",
+        "properties": {
+          "total_tokens": {
+            "type": "integer",
+            "example": 1200
+          },
+          "input_tokens": {
+            "type": "integer",
+            "example": 800
+          },
+          "output_tokens": {
+            "type": "integer",
+            "example": 400
+          },
+          "thinking_tokens": {
+            "type": "integer",
+            "example": 0
+          },
+          "total_calls": {
+            "type": "integer",
+            "example": 3
+          },
+          "avg_latency_ms": {
+            "type": "number",
+            "format": "float",
+            "example": 342.5
+          },
+          "provider": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "bedrock"
+            ]
+          },
+          "model": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "claude-3-5-sonnet-20241022"
+            ]
+          }
+        },
+        "required": [
+          "total_tokens",
+          "input_tokens",
+          "output_tokens",
+          "thinking_tokens",
+          "total_calls",
+          "avg_latency_ms",
+          "provider",
+          "model"
+        ]
+      },
+      "TaskInput": {
+        "type": "object",
+        "required": [
+          "runner_class",
+          "function"
+        ],
+        "properties": {
+          "runner_class": {
+            "type": "string",
+            "description": "Fully qualified runner class name",
+            "example": "Legion::Extensions::Http::Runners::Http"
+          },
+          "function": {
+            "type": "string",
+            "description": "Runner function name to invoke",
+            "example": "get"
+          },
+          "check_subtask": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether to check for an existing subtask before creating a new one"
+          },
+          "generate_task": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether to persist a task record for this invocation"
+          }
+        },
+        "additionalProperties": true
+      },
+      "TaskResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TaskObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "TaskCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "TaskLogObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "task_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "level": {
+            "type": "string",
+            "example": "info"
+          },
+          "message": {
+            "type": "string",
+            "example": "Task started"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "task_id",
+          "level",
+          "message",
+          "created_at"
+        ]
+      },
+      "TaskLogCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskLogObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "TaskCreatedObject": {
+        "type": "object",
+        "description": "Task creation result returned by Ingress.",
+        "properties": {
+          "task_id": {
+            "type": "integer",
+            "example": 42
+          }
+        },
+        "additionalProperties": true
+      },
+      "TaskCreatedResponse": {
+        "type": "object",
+        "description": "Response from POST /api/tasks — task_id and status from Ingress",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TaskCreatedObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "WorkerObject": {
+        "type": "object",
+        "properties": {
+          "worker_id": {
+            "type": "string",
+            "example": "worker-abc123"
+          },
+          "name": {
+            "type": "string",
+            "example": "my-invoice-processor"
+          },
+          "extension_name": {
+            "type": "string",
+            "example": "lex-invoice"
+          },
+          "entra_app_id": {
+            "type": "string",
+            "example": "00000000-0000-0000-0000-000000000001"
+          },
+          "owner_msid": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "owner_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Jane Doe"
+          },
+          "business_role": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Senior Engineer"
+          },
+          "risk_tier": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "tier-2"
+          },
+          "team": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "platform"
+          },
+          "lifecycle_state": {
+            "type": "string",
+            "example": "active"
+          },
+          "manager_msid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "manager@example.com"
+          },
+          "health_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "healthy"
+          },
+          "last_heartbeat_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "health_node": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "node-01"
+          }
+        },
+        "required": [
+          "worker_id",
+          "name",
+          "extension_name",
+          "entra_app_id",
+          "owner_msid",
+          "lifecycle_state"
+        ]
+      },
+      "WorkerInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "extension_name",
+          "entra_app_id",
+          "owner_msid"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "my-invoice-processor"
+          },
+          "extension_name": {
+            "type": "string",
+            "example": "lex-invoice"
+          },
+          "entra_app_id": {
+            "type": "string",
+            "example": "00000000-0000-0000-0000-000000000001"
+          },
+          "owner_msid": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "owner_name": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "business_role": {
+            "type": "string",
+            "example": "Senior Engineer"
+          },
+          "risk_tier": {
+            "type": "string",
+            "example": "tier-2"
+          },
+          "team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "manager_msid": {
+            "type": "string",
+            "example": "manager@example.com"
+          }
+        }
+      },
+      "WorkerLifecycleInput": {
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "description": "Target lifecycle state",
+            "example": "paused"
+          },
+          "by": {
+            "type": "string",
+            "description": "Identity performing the transition (MSID or service name)",
+            "example": "jane.doe@example.com"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Human-readable reason for the transition",
+            "example": "Scheduled maintenance window"
+          },
+          "governance_override": {
+            "type": "boolean",
+            "default": false,
+            "description": "Override governance gate (requires elevated authority)"
+          },
+          "authority_verified": {
+            "type": "boolean",
+            "default": false,
+            "description": "Confirm that the caller has verified authority for this transition"
+          }
+        }
+      },
+      "WorkerApproveInput": {
+        "type": "object",
+        "properties": {
+          "approver": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Verified with team lead"
+          }
+        }
+      },
+      "WorkerRejectInput": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "approver": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Missing risk assessment documentation"
+          }
+        }
+      },
+      "WorkerHealthObject": {
+        "type": "object",
+        "description": "Worker health snapshot.",
+        "properties": {
+          "worker_id": {
+            "type": "string",
+            "example": "worker-abc123"
+          },
+          "health_status": {
+            "type": "string",
+            "example": "healthy"
+          },
+          "last_heartbeat_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "health_node": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "node-01"
+          },
+          "node_metrics": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "worker_id",
+          "health_status"
+        ]
+      },
+      "WorkerHealthResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WorkerHealthObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "WorkerResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WorkerObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "WorkerCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkerObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ExtensionObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "lex-http"
+          },
+          "namespace": {
+            "type": "string",
+            "example": "Legion::Extensions::Http"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "0.2.5"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "namespace",
+          "active"
+        ]
+      },
+      "RunnerObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 10
+          },
+          "extension_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Http"
+          },
+          "namespace": {
+            "type": "string",
+            "example": "Legion::Extensions::Http::Runners::Http"
+          }
+        },
+        "required": [
+          "id",
+          "extension_id",
+          "name",
+          "namespace"
+        ]
+      },
+      "FunctionObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 100
+          },
+          "runner_id": {
+            "type": "integer",
+            "example": 10
+          },
+          "name": {
+            "type": "string",
+            "example": "get"
+          }
+        },
+        "required": [
+          "id",
+          "runner_id",
+          "name"
+        ]
+      },
+      "FunctionInvokeInput": {
+        "type": "object",
+        "description": "Payload forwarded to the runner function. All extra keys are passed through as the task payload. check_subtask and generate_task control Ingress behavior.\n",
+        "properties": {
+          "check_subtask": {
+            "type": "boolean",
+            "default": true
+          },
+          "generate_task": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "ExtensionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExtensionObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ExtensionCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExtensionObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RunnerResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RunnerObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RunnerCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RunnerObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "FunctionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FunctionObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "FunctionCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FunctionObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "NodeObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "node-01"
+          },
+          "status": {
+            "type": "string",
+            "example": "online"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "active",
+          "created_at"
+        ]
+      },
+      "NodeResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/NodeObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "NodeCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NodeObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ScheduleObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 5
+          },
+          "function_id": {
+            "type": "integer",
+            "example": 7
+          },
+          "cron": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "0 * * * *"
+          },
+          "interval": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Interval in seconds between runs",
+            "example": 300
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          },
+          "last_run": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "task_ttl": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Time-to-live for generated tasks, in seconds",
+            "example": 3600
+          },
+          "payload": {
+            "type": "object",
+            "description": "Arbitrary JSON payload forwarded to the runner on each execution.",
+            "additionalProperties": true
+          },
+          "transformation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional lex-transformer definition name to apply before execution",
+            "example": "normalize_invoice"
+          }
+        },
+        "required": [
+          "id",
+          "function_id",
+          "active"
+        ]
+      },
+      "ScheduleInput": {
+        "type": "object",
+        "required": [
+          "function_id"
+        ],
+        "properties": {
+          "function_id": {
+            "type": "integer",
+            "description": "ID of the function to invoke on each tick",
+            "example": 7
+          },
+          "cron": {
+            "type": "string",
+            "description": "Cron expression. Required when interval is not provided.",
+            "example": "0 * * * *"
+          },
+          "interval": {
+            "type": "integer",
+            "description": "Interval in seconds. Required when cron is not provided.",
+            "example": 300
+          },
+          "active": {
+            "type": "boolean",
+            "default": true
+          },
+          "task_ttl": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Time-to-live for generated tasks, in seconds",
+            "example": 3600
+          },
+          "payload": {
+            "type": "object",
+            "description": "Payload forwarded to the runner on each execution. Serialized to JSON when stored.\n",
+            "additionalProperties": true
+          },
+          "transformation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "lex-transformer definition name to apply before execution",
+            "example": "normalize_invoice"
+          }
+        }
+      },
+      "ScheduleUpdateInput": {
+        "type": "object",
+        "description": "All fields are optional. Only provided fields are updated. Must include at least one of cron or interval if changing the trigger.\n",
+        "properties": {
+          "cron": {
+            "type": "string",
+            "example": "*/5 * * * *"
+          },
+          "interval": {
+            "type": "integer",
+            "example": 600
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "task_ttl": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "transformation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ScheduleObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ScheduleCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ScheduleLogObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "schedule_id": {
+            "type": "integer",
+            "example": 5
+          },
+          "task_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "example": 42
+          },
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "ran_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "schedule_id",
+          "status",
+          "ran_at"
+        ]
+      },
+      "ScheduleLogCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleLogObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       }
     }
   }

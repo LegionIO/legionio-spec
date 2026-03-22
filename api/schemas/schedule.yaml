@@ -25,9 +25,9 @@ ScheduleObject:
       description: Time-to-live for generated tasks, in seconds
       example: 3600
     payload:
-      type: string
-      description: JSON-encoded payload forwarded to the runner on each execution
-      example: '{"key":"value"}'
+      type: object
+      description: Arbitrary JSON payload forwarded to the runner on each execution.
+      additionalProperties: true
     transformation:
       type: ['string', 'null']
       description: Optional lex-transformer definition name to apply before execution
@@ -98,7 +98,7 @@ ScheduleResponse:
   type: object
   properties:
     data:
-      $ref: '#/ScheduleObject'
+      $ref: './schedule.yaml#/ScheduleObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -111,7 +111,7 @@ ScheduleCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/ScheduleObject'
+        $ref: './schedule.yaml#/ScheduleObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:
@@ -148,7 +148,7 @@ ScheduleLogCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/ScheduleLogObject'
+        $ref: './schedule.yaml#/ScheduleLogObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:

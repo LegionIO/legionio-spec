@@ -45,7 +45,7 @@ ErrorResponse:
         - code
         - message
     meta:
-      $ref: '#/Meta'
+      $ref: './common.yaml#/Meta'
   required:
     - error
     - meta
@@ -59,7 +59,7 @@ DeletedResponse:
         deleted:
           type: boolean
     meta:
-      $ref: '#/Meta'
+      $ref: './common.yaml#/Meta'
   required:
     - data
     - meta

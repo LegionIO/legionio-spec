@@ -128,6 +128,8 @@ components:
       $ref: './schemas/task.yaml#/TaskLogObject'
     TaskLogCollectionResponse:
       $ref: './schemas/task.yaml#/TaskLogCollectionResponse'
+    TaskCreatedObject:
+      $ref: './schemas/task.yaml#/TaskCreatedObject'
     TaskCreatedResponse:
       $ref: './schemas/task.yaml#/TaskCreatedResponse'
 
@@ -142,6 +144,8 @@ components:
       $ref: './schemas/worker.yaml#/WorkerApproveInput'
     WorkerRejectInput:
       $ref: './schemas/worker.yaml#/WorkerRejectInput'
+    WorkerHealthObject:
+      $ref: './schemas/worker.yaml#/WorkerHealthObject'
     WorkerHealthResponse:
       $ref: './schemas/worker.yaml#/WorkerHealthResponse'
     WorkerResponse:

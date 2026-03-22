@@ -135,30 +135,34 @@ WorkerRejectInput:
       type: string
       example: Missing risk assessment documentation
 
+WorkerHealthObject:
+  type: object
+  description: Worker health snapshot.
+  properties:
+    worker_id:
+      type: string
+      example: worker-abc123
+    health_status:
+      type: string
+      example: healthy
+    last_heartbeat_at:
+      type: ['string', 'null']
+      format: date-time
+    health_node:
+      type: ['string', 'null']
+      example: node-01
+    node_metrics:
+      type: ['object', 'null']
+      additionalProperties: true
+  required:
+    - worker_id
+    - health_status
+
 WorkerHealthResponse:
   type: object
   properties:
     data:
-      type: object
-      properties:
-        worker_id:
-          type: string
-          example: worker-abc123
-        health_status:
-          type: string
-          example: healthy
-        last_heartbeat_at:
-          type: ['string', 'null']
-          format: date-time
-        health_node:
-          type: ['string', 'null']
-          example: node-01
-        node_metrics:
-          type: ['object', 'null']
-          additionalProperties: true
-      required:
-        - worker_id
-        - health_status
+      $ref: './worker.yaml#/WorkerHealthObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -169,7 +173,7 @@ WorkerResponse:
   type: object
   properties:
     data:
-      $ref: '#/WorkerObject'
+      $ref: './worker.yaml#/WorkerObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -182,7 +186,7 @@ WorkerCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/WorkerObject'
+        $ref: './worker.yaml#/WorkerObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:

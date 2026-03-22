@@ -78,7 +78,7 @@ ExtensionResponse:
   type: object
   properties:
     data:
-      $ref: '#/ExtensionObject'
+      $ref: './extension.yaml#/ExtensionObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -91,7 +91,7 @@ ExtensionCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/ExtensionObject'
+        $ref: './extension.yaml#/ExtensionObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:
@@ -102,7 +102,7 @@ RunnerResponse:
   type: object
   properties:
     data:
-      $ref: '#/RunnerObject'
+      $ref: './extension.yaml#/RunnerObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -115,7 +115,7 @@ RunnerCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/RunnerObject'
+        $ref: './extension.yaml#/RunnerObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:
@@ -126,7 +126,7 @@ FunctionResponse:
   type: object
   properties:
     data:
-      $ref: '#/FunctionObject'
+      $ref: './extension.yaml#/FunctionObject'
     meta:
       $ref: './common.yaml#/Meta'
   required:
@@ -139,7 +139,7 @@ FunctionCollectionResponse:
     data:
       type: array
       items:
-        $ref: '#/FunctionObject'
+        $ref: './extension.yaml#/FunctionObject'
     meta:
       $ref: './common.yaml#/MetaCollection'
   required:

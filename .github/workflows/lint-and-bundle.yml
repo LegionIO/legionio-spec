@@ -1,0 +1,22 @@
+name: Lint and Bundle
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx @redocly/cli lint api/openapi.yaml
+      - run: ./scripts/bundle.sh
+      - name: Check dist/openapi.json is up to date
+        run: |
+          git diff --exit-code dist/openapi.json || \
+            (echo "dist/openapi.json is out of date. Run ./scripts/bundle.sh and commit." && exit 1)

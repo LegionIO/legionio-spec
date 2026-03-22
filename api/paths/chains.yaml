@@ -1,0 +1,148 @@
+/api/chains:
+  get:
+    tags:
+      - Chains
+    summary: List chains
+    description: >
+      Stub endpoint, not yet implemented.
+      The Chain data model does not exist yet; this route always returns 501.
+    operationId: listChains
+    responses:
+      '501':
+        description: Not implemented — chain data model is not yet available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - Chains
+    summary: Create a chain
+    description: >
+      Stub endpoint, not yet implemented.
+      The Chain data model does not exist yet; this route always returns 501.
+      When implemented, name will be required.
+    operationId: createChain
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/chain.yaml#/ChainInput'
+    responses:
+      '501':
+        description: Not implemented — chain data model is not yet available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/chains/{id}:
+  get:
+    tags:
+      - Chains
+    summary: Get a chain
+    description: >
+      Stub endpoint, not yet implemented.
+      The Chain data model does not exist yet; this route always returns 501.
+    operationId: getChain
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Chain id
+    responses:
+      '501':
+        description: Not implemented — chain data model is not yet available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  put:
+    tags:
+      - Chains
+    summary: Update a chain
+    description: >
+      Stub endpoint, not yet implemented.
+      The Chain data model does not exist yet; this route always returns 501.
+    operationId: updateChain
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Chain id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/chain.yaml#/ChainUpdateInput'
+    responses:
+      '501':
+        description: Not implemented — chain data model is not yet available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  delete:
+    tags:
+      - Chains
+    summary: Delete a chain
+    description: >
+      Stub endpoint, not yet implemented.
+      The Chain data model does not exist yet; this route always returns 501.
+    operationId: deleteChain
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Chain id
+    responses:
+      '501':
+        description: Not implemented — chain data model is not yet available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

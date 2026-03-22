@@ -1,0 +1,102 @@
+RelationshipObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    parent_id:
+      type: ['integer', 'null']
+      description: ID of the parent task in the relationship
+      example: 10
+    child_id:
+      type: ['integer', 'null']
+      description: ID of the child task in the relationship
+      example: 11
+    function_id:
+      type: ['integer', 'null']
+      description: Function to invoke when the parent task completes
+      example: 7
+    conditioner_id:
+      type: ['integer', 'null']
+      description: Optional conditioner function applied before dispatching the child task
+      example: 3
+    transformer_id:
+      type: ['integer', 'null']
+      description: Optional transformer applied to the payload before dispatching
+      example: 2
+    active:
+      type: boolean
+      example: true
+  required:
+    - id
+
+RelationshipInput:
+  type: object
+  properties:
+    parent_id:
+      type: integer
+      description: ID of the parent task
+      example: 10
+    child_id:
+      type: integer
+      description: ID of the child task
+      example: 11
+    function_id:
+      type: integer
+      description: Function to invoke when the parent task completes
+      example: 7
+    conditioner_id:
+      type: ['integer', 'null']
+      description: Optional conditioner function id
+      example: 3
+    transformer_id:
+      type: ['integer', 'null']
+      description: Optional transformer function id
+      example: 2
+    active:
+      type: boolean
+      default: true
+
+RelationshipUpdateInput:
+  type: object
+  description: All fields are optional. Only provided fields are updated.
+  properties:
+    parent_id:
+      type: integer
+      example: 10
+    child_id:
+      type: integer
+      example: 11
+    function_id:
+      type: integer
+      example: 7
+    conditioner_id:
+      type: ['integer', 'null']
+    transformer_id:
+      type: ['integer', 'null']
+    active:
+      type: boolean
+
+RelationshipResponse:
+  type: object
+  properties:
+    data:
+      $ref: './relationship.yaml#/RelationshipObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RelationshipCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './relationship.yaml#/RelationshipObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta

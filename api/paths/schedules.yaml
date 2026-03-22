@@ -1,0 +1,290 @@
+/api/schedules:
+  get:
+    tags:
+      - Schedules
+    summary: List schedules
+    description: >
+      Returns all schedules ordered by id.
+      Pass active=true to return only active schedules.
+      Requires lex-scheduler to be loaded; returns 503 if not available.
+    operationId: listSchedules
+    parameters:
+      - name: active
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: ['true', 'false']
+          example: 'true'
+        description: When true, return only active schedules
+    responses:
+      '200':
+        description: Schedule list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schedule.yaml#/ScheduleCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Scheduler extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - Schedules
+    summary: Create a schedule
+    description: >
+      Creates a new cron or interval schedule for a function.
+      Either cron or interval must be provided (not both required, but at least one).
+      Returns 422 if function_id is missing or neither cron nor interval is provided.
+      Requires lex-scheduler to be loaded.
+    operationId: createSchedule
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schedule.yaml#/ScheduleInput'
+    responses:
+      '201':
+        description: Schedule created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schedule.yaml#/ScheduleResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing required field
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Scheduler extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/schedules/{id}:
+  get:
+    tags:
+      - Schedules
+    summary: Get a schedule
+    description: Returns a single schedule by id. Requires lex-scheduler.
+    operationId: getSchedule
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 5
+        description: Schedule id
+    responses:
+      '200':
+        description: Schedule detail
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schedule.yaml#/ScheduleResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Schedule not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Scheduler extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  put:
+    tags:
+      - Schedules
+    summary: Update a schedule
+    description: >
+      Updates one or more fields on an existing schedule.
+      All request body fields are optional; only provided fields are applied.
+      Requires lex-scheduler.
+    operationId: updateSchedule
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 5
+        description: Schedule id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/schedule.yaml#/ScheduleUpdateInput'
+    responses:
+      '200':
+        description: Schedule updated
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schedule.yaml#/ScheduleResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Schedule not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Scheduler extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  delete:
+    tags:
+      - Schedules
+    summary: Delete a schedule
+    description: Deletes a schedule by id. Requires lex-scheduler.
+    operationId: deleteSchedule
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 5
+        description: Schedule id
+    responses:
+      '200':
+        description: Schedule deleted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/DeletedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Schedule not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Scheduler extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/schedules/{id}/logs:
+  get:
+    tags:
+      - Schedules
+    summary: Get schedule logs
+    description: >
+      Returns execution log entries for a schedule, ordered by id descending.
+      Returns 404 if the schedule does not exist.
+      Requires lex-scheduler.
+    operationId: getScheduleLogs
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 5
+        description: Schedule id
+    responses:
+      '200':
+        description: Schedule log entries
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/schedule.yaml#/ScheduleLogCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Schedule not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Scheduler extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

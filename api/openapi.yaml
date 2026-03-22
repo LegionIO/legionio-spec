@@ -117,6 +117,23 @@ paths:
   /api/nodes/{id}:
     $ref: './paths/nodes.yaml#/~1api~1nodes~1{id}'
 
+  /api/schedules:
+    $ref: './paths/schedules.yaml#/~1api~1schedules'
+  /api/schedules/{id}:
+    $ref: './paths/schedules.yaml#/~1api~1schedules~1{id}'
+  /api/schedules/{id}/logs:
+    $ref: './paths/schedules.yaml#/~1api~1schedules~1{id}~1logs'
+
+  /api/relationships:
+    $ref: './paths/relationships.yaml#/~1api~1relationships'
+  /api/relationships/{id}:
+    $ref: './paths/relationships.yaml#/~1api~1relationships~1{id}'
+
+  /api/chains:
+    $ref: './paths/chains.yaml#/~1api~1chains'
+  /api/chains/{id}:
+    $ref: './paths/chains.yaml#/~1api~1chains~1{id}'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -225,3 +242,27 @@ components:
       $ref: './schemas/schedule.yaml#/ScheduleLogObject'
     ScheduleLogCollectionResponse:
       $ref: './schemas/schedule.yaml#/ScheduleLogCollectionResponse'
+
+    # Relationship schemas
+    RelationshipObject:
+      $ref: './schemas/relationship.yaml#/RelationshipObject'
+    RelationshipInput:
+      $ref: './schemas/relationship.yaml#/RelationshipInput'
+    RelationshipUpdateInput:
+      $ref: './schemas/relationship.yaml#/RelationshipUpdateInput'
+    RelationshipResponse:
+      $ref: './schemas/relationship.yaml#/RelationshipResponse'
+    RelationshipCollectionResponse:
+      $ref: './schemas/relationship.yaml#/RelationshipCollectionResponse'
+
+    # Chain schemas
+    ChainObject:
+      $ref: './schemas/chain.yaml#/ChainObject'
+    ChainInput:
+      $ref: './schemas/chain.yaml#/ChainInput'
+    ChainUpdateInput:
+      $ref: './schemas/chain.yaml#/ChainUpdateInput'
+    ChainResponse:
+      $ref: './schemas/chain.yaml#/ChainResponse'
+    ChainCollectionResponse:
+      $ref: './schemas/chain.yaml#/ChainCollectionResponse'

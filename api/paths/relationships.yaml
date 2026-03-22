@@ -1,0 +1,222 @@
+/api/relationships:
+  get:
+    tags:
+      - Relationships
+    summary: List relationships
+    description: >
+      Returns all task relationships ordered by id.
+      Requires legion-data to be connected.
+    operationId: listRelationships
+    responses:
+      '200':
+        description: Relationship list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/relationship.yaml#/RelationshipCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Data layer not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - Relationships
+    summary: Create a relationship
+    description: >
+      Creates a new task relationship record.
+      Requires legion-data to be connected.
+    operationId: createRelationship
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/relationship.yaml#/RelationshipInput'
+    responses:
+      '201':
+        description: Relationship created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/relationship.yaml#/RelationshipResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Data layer not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/relationships/{id}:
+  get:
+    tags:
+      - Relationships
+    summary: Get a relationship
+    description: Returns a single relationship by id. Requires legion-data.
+    operationId: getRelationship
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Relationship id
+    responses:
+      '200':
+        description: Relationship detail
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/relationship.yaml#/RelationshipResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Relationship not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Data layer not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  put:
+    tags:
+      - Relationships
+    summary: Update a relationship
+    description: >
+      Updates one or more fields on an existing relationship.
+      All request body fields are optional; only provided fields are applied.
+      Requires legion-data.
+    operationId: updateRelationship
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Relationship id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/relationship.yaml#/RelationshipUpdateInput'
+    responses:
+      '200':
+        description: Relationship updated
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/relationship.yaml#/RelationshipResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Relationship not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Data layer not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  delete:
+    tags:
+      - Relationships
+    summary: Delete a relationship
+    description: Deletes a relationship record by id. Requires legion-data.
+    operationId: deleteRelationship
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Relationship id
+    responses:
+      '200':
+        description: Relationship deleted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/DeletedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Relationship not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Data layer not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

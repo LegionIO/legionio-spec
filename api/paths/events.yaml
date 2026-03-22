@@ -1,0 +1,84 @@
+/api/events:
+  get:
+    tags:
+      - Events
+    summary: Stream live events (SSE)
+    description: >
+      Opens a Server-Sent Events (SSE) stream. The connection stays open and
+      the server pushes each Legion event as it is emitted.
+      Each frame has the form:
+
+        event: <event_name>\n
+        data: <JSON payload>\n
+        \n
+
+      The JSON payload is the event hash with all keys as strings.
+      The stream ends only when the client disconnects.
+      Set `Cache-Control: no-cache` on your client to avoid proxy buffering.
+    operationId: streamEvents
+    parameters: []
+    responses:
+      '200':
+        description: SSE event stream (text/event-stream)
+        content:
+          text/event-stream:
+            schema:
+              type: string
+              description: >
+                Newline-delimited SSE frames. Each frame contains an `event:` line
+                with the event name and a `data:` line with the JSON-encoded event
+                payload. Example frame:
+
+                  event: service.ready
+                  data: {"event":"service.ready","node":"legion-01","timestamp":"2026-03-22T12:00:00Z"}
+              example: |
+                event: service.ready
+                data: {"event":"service.ready","node":"legion-01","timestamp":"2026-03-22T12:00:00Z"}
+
+                event: extension.loaded
+                data: {"event":"extension.loaded","name":"lex-node","node":"legion-01","timestamp":"2026-03-22T12:00:01Z"}
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/events/recent:
+  get:
+    tags:
+      - Events
+    summary: List recent events
+    description: >
+      Returns the most recent events from the in-process ring buffer (max 100 entries).
+      Defaults to the last 25 events. Use the `count` query parameter to request more.
+    operationId: listRecentEvents
+    parameters:
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 25
+          maximum: 100
+          example: 25
+        description: Number of recent events to return (capped at 100)
+    responses:
+      '200':
+        description: Recent event list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/event.yaml#/EventCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

@@ -2332,6 +2332,473 @@
           }
         }
       }
+    },
+    "/api/settings": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "List all settings",
+        "description": "Returns the full settings hash with sensitive keys redacted. Sensitive keys include: password, secret, token, key, cert, private_key, api_key.\n",
+        "operationId": "getSettings",
+        "responses": {
+          "200": {
+            "description": "Redacted settings object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/settings/{key}": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get a setting by key",
+        "description": "Returns the value for a single top-level settings key. Nested hash values are redacted for sensitive keys. Returns 404 if the key does not exist.\n",
+        "operationId": "getSetting",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "transport"
+            },
+            "description": "Top-level settings key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Setting key and value",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Setting key not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update a setting",
+        "description": "Updates the runtime value for a top-level settings key. The sections `crypt` and `transport` are read-only and return 403. The request body must include a `value` field; missing value returns 422.\n",
+        "operationId": "updateSetting",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "logging"
+            },
+            "description": "Top-level settings key to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Setting updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Setting is read-only via API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing value field",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Stream live events (SSE)",
+        "description": "Opens a Server-Sent Events (SSE) stream. The connection stays open and the server pushes each Legion event as it is emitted. Each frame has the form:\n\n  event: <event_name>\\n\n  data: <JSON payload>\\n\n  \\n\n\nThe JSON payload is the event hash with all keys as strings. The stream ends only when the client disconnects. Set `Cache-Control: no-cache` on your client to avoid proxy buffering.\n",
+        "operationId": "streamEvents",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "SSE event stream (text/event-stream)",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Newline-delimited SSE frames. Each frame contains an `event:` line with the event name and a `data:` line with the JSON-encoded event payload. Example frame:\n\n  event: service.ready\n  data: {\"event\":\"service.ready\",\"node\":\"legion-01\",\"timestamp\":\"2026-03-22T12:00:00Z\"}\n",
+                  "example": "event: service.ready\ndata: {\"event\":\"service.ready\",\"node\":\"legion-01\",\"timestamp\":\"2026-03-22T12:00:00Z\"}\n\nevent: extension.loaded\ndata: {\"event\":\"extension.loaded\",\"name\":\"lex-node\",\"node\":\"legion-01\",\"timestamp\":\"2026-03-22T12:00:01Z\"}\n"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events/recent": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "List recent events",
+        "description": "Returns the most recent events from the in-process ring buffer (max 100 entries). Defaults to the last 25 events. Use the `count` query parameter to request more.\n",
+        "operationId": "listRecentEvents",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25,
+              "maximum": 100,
+              "example": 25
+            },
+            "description": "Number of recent events to return (capped at 100)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recent event list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transport": {
+      "get": {
+        "tags": [
+          "Transport"
+        ],
+        "summary": "Get transport status",
+        "description": "Returns the current RabbitMQ transport connection status including whether the session and channel are open, and the connector type.\n",
+        "operationId": "getTransportStatus",
+        "responses": {
+          "200": {
+            "description": "Transport connection status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransportStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transport/exchanges": {
+      "get": {
+        "tags": [
+          "Transport"
+        ],
+        "summary": "List exchanges",
+        "description": "Returns a list of registered AMQP exchange subclasses known to this node. Returns an empty array if Legion::Transport::Exchange is not defined.\n",
+        "operationId": "listExchanges",
+        "responses": {
+          "200": {
+            "description": "Exchange list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transport/queues": {
+      "get": {
+        "tags": [
+          "Transport"
+        ],
+        "summary": "List queues",
+        "description": "Returns a list of registered AMQP queue subclasses known to this node. Returns an empty array if Legion::Transport::Queue is not defined.\n",
+        "operationId": "listQueues",
+        "responses": {
+          "200": {
+            "description": "Queue list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueueCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transport/publish": {
+      "post": {
+        "tags": [
+          "Transport"
+        ],
+        "summary": "Publish a message",
+        "description": "Publishes a message to a named AMQP exchange with a routing key. Both `exchange` and `routing_key` are required; returns 422 if either is missing. The optional `payload` object is merged into the Dynamic message body. Returns 201 on success or 500 if the publish raises an error.\n",
+        "operationId": "publishMessage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing required field",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Publish error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3745,6 +4212,309 @@
           },
           "meta": {
             "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "SettingObject": {
+        "type": "object",
+        "description": "A single top-level settings key and its (possibly redacted) value",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Settings key name",
+            "example": "logging"
+          },
+          "value": {
+            "description": "Settings value; may be a scalar, array, or nested object. Sensitive keys are redacted.",
+            "example": {
+              "level": "info",
+              "json": false
+            }
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ]
+      },
+      "SettingUpdateInput": {
+        "type": "object",
+        "description": "Request body for updating a settings key",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "description": "New value for the settings key (scalar, array, or object)",
+            "example": {
+              "level": "debug",
+              "json": true
+            }
+          }
+        }
+      },
+      "SettingResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SettingObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "SettingsResponse": {
+        "type": "object",
+        "description": "Full settings hash with sensitive keys redacted",
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "All top-level settings keys, sensitive values replaced with [REDACTED]"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "EventObject": {
+        "type": "object",
+        "description": "A Legion in-process event captured in the ring buffer",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Event name",
+            "example": "service.ready"
+          },
+          "node": {
+            "type": "string",
+            "description": "Node identifier that emitted the event",
+            "example": "legion-01"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when the event was emitted",
+            "example": "2026-03-22T12:00:00Z"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "event"
+        ]
+      },
+      "EventCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "TransportStatus": {
+        "type": "object",
+        "description": "RabbitMQ transport connection status",
+        "properties": {
+          "connected": {
+            "type": "boolean",
+            "description": "Whether the transport setting reports connected",
+            "example": true
+          },
+          "session_open": {
+            "type": "boolean",
+            "description": "Whether the AMQP session is open",
+            "example": true
+          },
+          "channel_open": {
+            "type": "boolean",
+            "description": "Whether the AMQP channel is open",
+            "example": true
+          },
+          "connector": {
+            "type": "string",
+            "description": "Transport connector type (e.g. bunny, amqp)",
+            "example": "bunny"
+          }
+        },
+        "required": [
+          "connected",
+          "session_open",
+          "channel_open",
+          "connector"
+        ]
+      },
+      "TransportStatusResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TransportStatus"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ExchangeObject": {
+        "type": "object",
+        "description": "A registered AMQP exchange subclass",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Exchange class name",
+            "example": "Legion::Transport::Exchanges::Task"
+          },
+          "exchange": {
+            "type": "string",
+            "description": "AMQP exchange name",
+            "example": "tasks"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ExchangeCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExchangeObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "QueueObject": {
+        "type": "object",
+        "description": "A registered AMQP queue subclass",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Queue class name",
+            "example": "Legion::Transport::Queues::Task"
+          },
+          "queue": {
+            "type": "string",
+            "description": "AMQP queue name",
+            "example": "task"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "QueueCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueueObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "PublishInput": {
+        "type": "object",
+        "description": "Parameters for publishing a message to RabbitMQ",
+        "required": [
+          "exchange",
+          "routing_key"
+        ],
+        "properties": {
+          "exchange": {
+            "type": "string",
+            "description": "Name of the AMQP exchange to publish to",
+            "example": "tasks"
+          },
+          "routing_key": {
+            "type": "string",
+            "description": "Routing key for the message",
+            "example": "task.run"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Optional message payload merged into the Dynamic message body",
+            "example": {
+              "runner_class": "Legion::Extensions::Http::Runners::Http",
+              "function": "get"
+            }
+          }
+        }
+      },
+      "PublishResult": {
+        "type": "object",
+        "description": "Result of a publish operation",
+        "properties": {
+          "published": {
+            "type": "boolean",
+            "example": true
+          },
+          "exchange": {
+            "type": "string",
+            "example": "tasks"
+          },
+          "routing_key": {
+            "type": "string",
+            "example": "task.run"
+          }
+        },
+        "required": [
+          "published",
+          "exchange",
+          "routing_key"
+        ]
+      },
+      "PublishResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PublishResult"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
           }
         },
         "required": [

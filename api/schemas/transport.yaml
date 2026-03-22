@@ -1,0 +1,144 @@
+TransportStatus:
+  type: object
+  description: RabbitMQ transport connection status
+  properties:
+    connected:
+      type: boolean
+      description: Whether the transport setting reports connected
+      example: true
+    session_open:
+      type: boolean
+      description: Whether the AMQP session is open
+      example: true
+    channel_open:
+      type: boolean
+      description: Whether the AMQP channel is open
+      example: true
+    connector:
+      type: string
+      description: Transport connector type (e.g. bunny, amqp)
+      example: bunny
+  required:
+    - connected
+    - session_open
+    - channel_open
+    - connector
+
+TransportStatusResponse:
+  type: object
+  properties:
+    data:
+      $ref: './transport.yaml#/TransportStatus'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+ExchangeObject:
+  type: object
+  description: A registered AMQP exchange subclass
+  properties:
+    name:
+      type: string
+      description: Exchange class name
+      example: Legion::Transport::Exchanges::Task
+    exchange:
+      type: string
+      description: AMQP exchange name
+      example: tasks
+  required:
+    - name
+
+ExchangeCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './transport.yaml#/ExchangeObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+QueueObject:
+  type: object
+  description: A registered AMQP queue subclass
+  properties:
+    name:
+      type: string
+      description: Queue class name
+      example: Legion::Transport::Queues::Task
+    queue:
+      type: string
+      description: AMQP queue name
+      example: task
+  required:
+    - name
+
+QueueCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './transport.yaml#/QueueObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+PublishInput:
+  type: object
+  description: Parameters for publishing a message to RabbitMQ
+  required:
+    - exchange
+    - routing_key
+  properties:
+    exchange:
+      type: string
+      description: Name of the AMQP exchange to publish to
+      example: tasks
+    routing_key:
+      type: string
+      description: Routing key for the message
+      example: task.run
+    payload:
+      type: object
+      additionalProperties: true
+      description: Optional message payload merged into the Dynamic message body
+      example:
+        runner_class: Legion::Extensions::Http::Runners::Http
+        function: get
+
+PublishResponse:
+  type: object
+  properties:
+    data:
+      $ref: './transport.yaml#/PublishResult'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+PublishResult:
+  type: object
+  description: Result of a publish operation
+  properties:
+    published:
+      type: boolean
+      example: true
+    exchange:
+      type: string
+      example: tasks
+    routing_key:
+      type: string
+      example: task.run
+  required:
+    - published
+    - exchange
+    - routing_key

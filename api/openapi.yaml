@@ -134,6 +134,25 @@ paths:
   /api/chains/{id}:
     $ref: './paths/chains.yaml#/~1api~1chains~1{id}'
 
+  /api/settings:
+    $ref: './paths/settings.yaml#/~1api~1settings'
+  /api/settings/{key}:
+    $ref: './paths/settings.yaml#/~1api~1settings~1{key}'
+
+  /api/events:
+    $ref: './paths/events.yaml#/~1api~1events'
+  /api/events/recent:
+    $ref: './paths/events.yaml#/~1api~1events~1recent'
+
+  /api/transport:
+    $ref: './paths/transport.yaml#/~1api~1transport'
+  /api/transport/exchanges:
+    $ref: './paths/transport.yaml#/~1api~1transport~1exchanges'
+  /api/transport/queues:
+    $ref: './paths/transport.yaml#/~1api~1transport~1queues'
+  /api/transport/publish:
+    $ref: './paths/transport.yaml#/~1api~1transport~1publish'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -266,3 +285,39 @@ components:
       $ref: './schemas/chain.yaml#/ChainResponse'
     ChainCollectionResponse:
       $ref: './schemas/chain.yaml#/ChainCollectionResponse'
+
+    # Setting schemas
+    SettingObject:
+      $ref: './schemas/setting.yaml#/SettingObject'
+    SettingUpdateInput:
+      $ref: './schemas/setting.yaml#/SettingUpdateInput'
+    SettingResponse:
+      $ref: './schemas/setting.yaml#/SettingResponse'
+    SettingsResponse:
+      $ref: './schemas/setting.yaml#/SettingsResponse'
+
+    # Event schemas
+    EventObject:
+      $ref: './schemas/event.yaml#/EventObject'
+    EventCollectionResponse:
+      $ref: './schemas/event.yaml#/EventCollectionResponse'
+
+    # Transport schemas
+    TransportStatus:
+      $ref: './schemas/transport.yaml#/TransportStatus'
+    TransportStatusResponse:
+      $ref: './schemas/transport.yaml#/TransportStatusResponse'
+    ExchangeObject:
+      $ref: './schemas/transport.yaml#/ExchangeObject'
+    ExchangeCollectionResponse:
+      $ref: './schemas/transport.yaml#/ExchangeCollectionResponse'
+    QueueObject:
+      $ref: './schemas/transport.yaml#/QueueObject'
+    QueueCollectionResponse:
+      $ref: './schemas/transport.yaml#/QueueCollectionResponse'
+    PublishInput:
+      $ref: './schemas/transport.yaml#/PublishInput'
+    PublishResult:
+      $ref: './schemas/transport.yaml#/PublishResult'
+    PublishResponse:
+      $ref: './schemas/transport.yaml#/PublishResponse'

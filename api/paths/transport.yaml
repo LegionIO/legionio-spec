@@ -1,0 +1,129 @@
+/api/transport:
+  get:
+    tags:
+      - Transport
+    summary: Get transport status
+    description: >
+      Returns the current RabbitMQ transport connection status including
+      whether the session and channel are open, and the connector type.
+    operationId: getTransportStatus
+    responses:
+      '200':
+        description: Transport connection status
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/transport.yaml#/TransportStatusResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/transport/exchanges:
+  get:
+    tags:
+      - Transport
+    summary: List exchanges
+    description: >
+      Returns a list of registered AMQP exchange subclasses known to this node.
+      Returns an empty array if Legion::Transport::Exchange is not defined.
+    operationId: listExchanges
+    responses:
+      '200':
+        description: Exchange list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/transport.yaml#/ExchangeCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/transport/queues:
+  get:
+    tags:
+      - Transport
+    summary: List queues
+    description: >
+      Returns a list of registered AMQP queue subclasses known to this node.
+      Returns an empty array if Legion::Transport::Queue is not defined.
+    operationId: listQueues
+    responses:
+      '200':
+        description: Queue list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/transport.yaml#/QueueCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/transport/publish:
+  post:
+    tags:
+      - Transport
+    summary: Publish a message
+    description: >
+      Publishes a message to a named AMQP exchange with a routing key.
+      Both `exchange` and `routing_key` are required; returns 422 if either is missing.
+      The optional `payload` object is merged into the Dynamic message body.
+      Returns 201 on success or 500 if the publish raises an error.
+    operationId: publishMessage
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/transport.yaml#/PublishInput'
+    responses:
+      '201':
+        description: Message published
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/transport.yaml#/PublishResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing required field
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Publish error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

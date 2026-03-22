@@ -1,0 +1,53 @@
+SettingObject:
+  type: object
+  description: A single top-level settings key and its (possibly redacted) value
+  properties:
+    key:
+      type: string
+      description: Settings key name
+      example: logging
+    value:
+      description: Settings value; may be a scalar, array, or nested object. Sensitive keys are redacted.
+      example:
+        level: info
+        json: false
+  required:
+    - key
+    - value
+
+SettingResponse:
+  type: object
+  properties:
+    data:
+      $ref: './setting.yaml#/SettingObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+SettingsResponse:
+  type: object
+  description: Full settings hash with sensitive keys redacted
+  properties:
+    data:
+      type: object
+      additionalProperties: true
+      description: All top-level settings keys, sensitive values replaced with [REDACTED]
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+SettingUpdateInput:
+  type: object
+  description: Request body for updating a settings key
+  required:
+    - value
+  properties:
+    value:
+      description: New value for the settings key (scalar, array, or object)
+      example:
+        level: debug
+        json: true

@@ -1,0 +1,33 @@
+EventObject:
+  type: object
+  description: A Legion in-process event captured in the ring buffer
+  properties:
+    event:
+      type: string
+      description: Event name
+      example: service.ready
+    node:
+      type: string
+      description: Node identifier that emitted the event
+      example: legion-01
+    timestamp:
+      type: string
+      format: date-time
+      description: ISO 8601 timestamp when the event was emitted
+      example: '2026-03-22T12:00:00Z'
+  additionalProperties: true
+  required:
+    - event
+
+EventCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './event.yaml#/EventObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta

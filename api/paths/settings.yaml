@@ -1,0 +1,127 @@
+/api/settings:
+  get:
+    tags:
+      - Settings
+    summary: List all settings
+    description: >
+      Returns the full settings hash with sensitive keys redacted.
+      Sensitive keys include: password, secret, token, key, cert, private_key, api_key.
+    operationId: getSettings
+    responses:
+      '200':
+        description: Redacted settings object
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/setting.yaml#/SettingsResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/settings/{key}:
+  get:
+    tags:
+      - Settings
+    summary: Get a setting by key
+    description: >
+      Returns the value for a single top-level settings key.
+      Nested hash values are redacted for sensitive keys.
+      Returns 404 if the key does not exist.
+    operationId: getSetting
+    parameters:
+      - name: key
+        in: path
+        required: true
+        schema:
+          type: string
+          example: transport
+        description: Top-level settings key
+    responses:
+      '200':
+        description: Setting key and value
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/setting.yaml#/SettingResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Setting key not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  put:
+    tags:
+      - Settings
+    summary: Update a setting
+    description: >
+      Updates the runtime value for a top-level settings key.
+      The sections `crypt` and `transport` are read-only and return 403.
+      The request body must include a `value` field; missing value returns 422.
+    operationId: updateSetting
+    parameters:
+      - name: key
+        in: path
+        required: true
+        schema:
+          type: string
+          example: logging
+        description: Top-level settings key to update
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/setting.yaml#/SettingUpdateInput'
+    responses:
+      '200':
+        description: Setting updated
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/setting.yaml#/SettingResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '403':
+        description: Setting is read-only via API
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing value field
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

@@ -211,6 +211,39 @@ paths:
   /api/auth/saml/acs:
     $ref: './paths/auth.yaml#/~1api~1auth~1saml~1acs'
 
+  /api/rbac/roles:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1roles'
+  /api/rbac/roles/{name}:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1roles~1{name}'
+  /api/rbac/check:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1check'
+  /api/rbac/assignments:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1assignments'
+  /api/rbac/assignments/{id}:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1assignments~1{id}'
+  /api/rbac/grants:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1grants'
+  /api/rbac/grants/{id}:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1grants~1{id}'
+  /api/rbac/grants/cross-team:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1grants~1cross-team'
+  /api/rbac/grants/cross-team/{id}:
+    $ref: './paths/rbac.yaml#/~1api~1rbac~1grants~1cross-team~1{id}'
+
+  /api/audit:
+    $ref: './paths/audit.yaml#/~1api~1audit'
+  /api/audit/verify:
+    $ref: './paths/audit.yaml#/~1api~1audit~1verify'
+
+  /api/governance/approvals:
+    $ref: './paths/governance.yaml#/~1api~1governance~1approvals'
+  /api/governance/approvals/{id}:
+    $ref: './paths/governance.yaml#/~1api~1governance~1approvals~1{id}'
+  /api/governance/approvals/{id}/approve:
+    $ref: './paths/governance.yaml#/~1api~1governance~1approvals~1{id}~1approve'
+  /api/governance/approvals/{id}/reject:
+    $ref: './paths/governance.yaml#/~1api~1governance~1approvals~1{id}~1reject'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -401,3 +434,63 @@ components:
       $ref: './schemas/auth.yaml#/HumanTokenResponse'
     WorkerTokenResponse:
       $ref: './schemas/auth.yaml#/WorkerTokenResponse'
+
+    # RBAC schemas
+    RoleObject:
+      $ref: './schemas/rbac.yaml#/RoleObject'
+    RoleDetailObject:
+      $ref: './schemas/rbac.yaml#/RoleDetailObject'
+    RoleCollectionResponse:
+      $ref: './schemas/rbac.yaml#/RoleCollectionResponse'
+    RoleResponse:
+      $ref: './schemas/rbac.yaml#/RoleResponse'
+    RbacCheckInput:
+      $ref: './schemas/rbac.yaml#/RbacCheckInput'
+    RbacCheckResponse:
+      $ref: './schemas/rbac.yaml#/RbacCheckResponse'
+    RbacAssignmentObject:
+      $ref: './schemas/rbac.yaml#/RbacAssignmentObject'
+    RbacAssignmentInput:
+      $ref: './schemas/rbac.yaml#/RbacAssignmentInput'
+    RbacAssignmentResponse:
+      $ref: './schemas/rbac.yaml#/RbacAssignmentResponse'
+    RbacAssignmentCollectionResponse:
+      $ref: './schemas/rbac.yaml#/RbacAssignmentCollectionResponse'
+    RbacGrantObject:
+      $ref: './schemas/rbac.yaml#/RbacGrantObject'
+    RbacGrantInput:
+      $ref: './schemas/rbac.yaml#/RbacGrantInput'
+    RbacGrantResponse:
+      $ref: './schemas/rbac.yaml#/RbacGrantResponse'
+    RbacGrantCollectionResponse:
+      $ref: './schemas/rbac.yaml#/RbacGrantCollectionResponse'
+    RbacCrossTeamGrantObject:
+      $ref: './schemas/rbac.yaml#/RbacCrossTeamGrantObject'
+    RbacCrossTeamGrantInput:
+      $ref: './schemas/rbac.yaml#/RbacCrossTeamGrantInput'
+    RbacCrossTeamGrantResponse:
+      $ref: './schemas/rbac.yaml#/RbacCrossTeamGrantResponse'
+    RbacCrossTeamGrantCollectionResponse:
+      $ref: './schemas/rbac.yaml#/RbacCrossTeamGrantCollectionResponse'
+
+    # Audit schemas
+    AuditLogObject:
+      $ref: './schemas/audit.yaml#/AuditLogObject'
+    AuditLogCollectionResponse:
+      $ref: './schemas/audit.yaml#/AuditLogCollectionResponse'
+    AuditVerifyResult:
+      $ref: './schemas/audit.yaml#/AuditVerifyResult'
+    AuditVerifyResponse:
+      $ref: './schemas/audit.yaml#/AuditVerifyResponse'
+
+    # Governance schemas
+    ApprovalObject:
+      $ref: './schemas/governance.yaml#/ApprovalObject'
+    ApprovalInput:
+      $ref: './schemas/governance.yaml#/ApprovalInput'
+    ApprovalReviewInput:
+      $ref: './schemas/governance.yaml#/ApprovalReviewInput'
+    ApprovalResponse:
+      $ref: './schemas/governance.yaml#/ApprovalResponse'
+    ApprovalCollectionResponse:
+      $ref: './schemas/governance.yaml#/ApprovalCollectionResponse'

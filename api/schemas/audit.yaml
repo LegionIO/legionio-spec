@@ -1,0 +1,71 @@
+AuditLogObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    event_type:
+      type: string
+      example: task.created
+    principal_id:
+      type: string
+      example: jane.doe@example.com
+    source:
+      type: string
+      example: api
+    status:
+      type: string
+      example: success
+    payload:
+      type: object
+      description: Event-specific payload
+    created_at:
+      type: string
+      format: date-time
+  required:
+    - id
+    - event_type
+
+AuditLogCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './audit.yaml#/AuditLogObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+AuditVerifyResult:
+  type: object
+  description: Result of tamper-evident hash chain verification from lex-audit
+  properties:
+    valid:
+      type: boolean
+      example: true
+    checked:
+      type: integer
+      description: Number of audit entries checked
+      example: 1024
+    broken_at:
+      type:
+        - integer
+        - 'null'
+      description: ID of first entry where chain is broken (null if valid)
+    message:
+      type: string
+      example: Audit chain is intact
+
+AuditVerifyResponse:
+  type: object
+  properties:
+    data:
+      $ref: './audit.yaml#/AuditVerifyResult'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta

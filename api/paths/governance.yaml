@@ -1,0 +1,257 @@
+/api/governance/approvals:
+  get:
+    tags:
+      - Governance
+    summary: List pending approvals
+    description: >
+      Returns a list of pending approval requests via lex-audit ApprovalQueue.
+      Optionally filtered by tenant_id and limited in count.
+      Returns 503 if lex-audit is not available or legion-data is not connected.
+    operationId: listApprovals
+    parameters:
+      - name: tenant_id
+        in: query
+        required: false
+        schema:
+          type: string
+          example: acme
+        description: Filter by tenant id
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 50
+          example: 20
+        description: Maximum number of results to return
+    responses:
+      '200':
+        description: Pending approvals list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/governance.yaml#/ApprovalCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-audit not available or legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - Governance
+    summary: Submit an approval request
+    description: >
+      Submits a new approval request via lex-audit ApprovalQueue.
+      Requires approval_type and requester_id. Returns 422 if either is missing.
+      Returns 503 if lex-audit is not available or legion-data is not connected.
+    operationId: submitApproval
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/governance.yaml#/ApprovalInput'
+    responses:
+      '201':
+        description: Approval request submitted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/governance.yaml#/ApprovalResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing required field
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-audit not available or legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/governance/approvals/{id}:
+  get:
+    tags:
+      - Governance
+    summary: Get an approval request
+    description: >
+      Returns a single approval request by id via lex-audit ApprovalQueue.
+      Returns 404 if not found, 503 if lex-audit is not available.
+    operationId: getApproval
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Approval request id
+    responses:
+      '200':
+        description: Approval request detail
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/governance.yaml#/ApprovalResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Approval not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-audit not available or legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/governance/approvals/{id}/approve:
+  put:
+    tags:
+      - Governance
+    summary: Approve a request
+    description: >
+      Approves a pending approval request by id via lex-audit ApprovalQueue.
+      Requires reviewer_id. Returns 422 if missing, 503 if dependencies unavailable.
+    operationId: approveRequest
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Approval request id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/governance.yaml#/ApprovalReviewInput'
+    responses:
+      '200':
+        description: Approval accepted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/governance.yaml#/ApprovalResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing reviewer_id
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-audit not available or legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/governance/approvals/{id}/reject:
+  put:
+    tags:
+      - Governance
+    summary: Reject a request
+    description: >
+      Rejects a pending approval request by id via lex-audit ApprovalQueue.
+      Requires reviewer_id. Returns 422 if missing, 503 if dependencies unavailable.
+    operationId: rejectRequest
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Approval request id
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/governance.yaml#/ApprovalReviewInput'
+    responses:
+      '200':
+        description: Approval rejected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/governance.yaml#/ApprovalResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing reviewer_id
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-audit not available or legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

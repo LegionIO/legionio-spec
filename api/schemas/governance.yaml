@@ -1,0 +1,95 @@
+ApprovalObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    approval_type:
+      type: string
+      example: worker.create
+    requester_id:
+      type: string
+      example: jane.doe@example.com
+    reviewer_id:
+      type:
+        - string
+        - 'null'
+      example: reviewer@example.com
+    tenant_id:
+      type:
+        - string
+        - 'null'
+      example: acme
+    status:
+      type: string
+      enum:
+        - pending
+        - approved
+        - rejected
+      example: pending
+    payload:
+      type: object
+      description: Approval-type-specific payload
+    created_at:
+      type: string
+      format: date-time
+    updated_at:
+      type: string
+      format: date-time
+  required:
+    - id
+    - approval_type
+    - requester_id
+    - status
+
+ApprovalResponse:
+  type: object
+  properties:
+    data:
+      $ref: './governance.yaml#/ApprovalObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+ApprovalCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './governance.yaml#/ApprovalObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+ApprovalInput:
+  type: object
+  properties:
+    approval_type:
+      type: string
+      example: worker.create
+    requester_id:
+      type: string
+      example: jane.doe@example.com
+    tenant_id:
+      type: string
+      example: acme
+    payload:
+      type: object
+      description: Approval-type-specific payload
+  required:
+    - approval_type
+    - requester_id
+
+ApprovalReviewInput:
+  type: object
+  properties:
+    reviewer_id:
+      type: string
+      example: reviewer@example.com
+  required:
+    - reviewer_id

@@ -1,0 +1,370 @@
+RolePermission:
+  type: object
+  properties:
+    resource:
+      type: string
+      example: 'tasks/*'
+    actions:
+      type: array
+      items:
+        type: string
+      example:
+        - read
+        - write
+  required:
+    - resource
+    - actions
+
+RoleDenyRule:
+  type: object
+  properties:
+    resource:
+      type: string
+      example: 'admin/*'
+    above_level:
+      type: integer
+      example: 2
+  required:
+    - resource
+
+RoleObject:
+  type: object
+  properties:
+    name:
+      type: string
+      example: operator
+    description:
+      type: string
+      example: Can read and trigger tasks
+    cross_team:
+      type: boolean
+      example: false
+  required:
+    - name
+    - description
+    - cross_team
+
+RoleDetailObject:
+  type: object
+  properties:
+    name:
+      type: string
+      example: operator
+    description:
+      type: string
+      example: Can read and trigger tasks
+    cross_team:
+      type: boolean
+      example: false
+    permissions:
+      type: array
+      items:
+        $ref: './rbac.yaml#/RolePermission'
+    deny_rules:
+      type: array
+      items:
+        $ref: './rbac.yaml#/RoleDenyRule'
+  required:
+    - name
+    - description
+    - cross_team
+    - permissions
+    - deny_rules
+
+RoleCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      description: Map of role name to role summary object
+      additionalProperties:
+        $ref: './rbac.yaml#/RoleObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RoleResponse:
+  type: object
+  properties:
+    data:
+      $ref: './rbac.yaml#/RoleDetailObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RbacCheckInput:
+  type: object
+  properties:
+    principal:
+      type: string
+      description: Principal identifier (defaults to anonymous)
+      example: jane.doe@example.com
+    roles:
+      type: array
+      items:
+        type: string
+      example:
+        - operator
+    team:
+      type: string
+      example: platform
+    action:
+      type: string
+      description: Action to check (defaults to read)
+      example: write
+    resource:
+      type: string
+      description: Resource pattern to check (defaults to *)
+      example: tasks/42
+
+RbacCheckResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      description: Policy evaluation result from Legion::Rbac::PolicyEngine
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RbacAssignmentObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    principal_type:
+      type: string
+      example: human
+    principal_id:
+      type: string
+      example: jane.doe@example.com
+    role:
+      type: string
+      example: operator
+    team:
+      type: string
+      example: platform
+    granted_by:
+      type: string
+      example: admin@example.com
+    expires_at:
+      type:
+        - string
+        - 'null'
+      format: date-time
+  required:
+    - id
+    - principal_type
+    - principal_id
+    - role
+
+RbacAssignmentInput:
+  type: object
+  properties:
+    principal_type:
+      type: string
+      description: Type of principal (defaults to human)
+      example: human
+    principal_id:
+      type: string
+      example: jane.doe@example.com
+    role:
+      type: string
+      example: operator
+    team:
+      type: string
+      example: platform
+    expires_at:
+      type: string
+      format: date-time
+      description: Optional expiry for time-limited assignments
+  required:
+    - principal_id
+    - role
+
+RbacAssignmentResponse:
+  type: object
+  properties:
+    data:
+      $ref: './rbac.yaml#/RbacAssignmentObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RbacAssignmentCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './rbac.yaml#/RbacAssignmentObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+RbacGrantObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    team:
+      type: string
+      example: platform
+    runner_pattern:
+      type: string
+      example: 'lex-node.*'
+    actions:
+      type: string
+      description: Comma-separated action list
+      example: 'read,write'
+    granted_by:
+      type: string
+      example: admin@example.com
+  required:
+    - id
+    - team
+    - runner_pattern
+    - actions
+
+RbacGrantInput:
+  type: object
+  properties:
+    team:
+      type: string
+      example: platform
+    runner_pattern:
+      type: string
+      example: 'lex-node.*'
+    actions:
+      type: array
+      items:
+        type: string
+      example:
+        - read
+        - write
+  required:
+    - team
+    - runner_pattern
+    - actions
+
+RbacGrantResponse:
+  type: object
+  properties:
+    data:
+      $ref: './rbac.yaml#/RbacGrantObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RbacGrantCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './rbac.yaml#/RbacGrantObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+RbacCrossTeamGrantObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    source_team:
+      type: string
+      example: platform
+    target_team:
+      type: string
+      example: app-team
+    runner_pattern:
+      type: string
+      example: 'lex-node.*'
+    actions:
+      type: string
+      description: Comma-separated action list
+      example: 'read'
+    granted_by:
+      type: string
+      example: admin@example.com
+    expires_at:
+      type:
+        - string
+        - 'null'
+      format: date-time
+  required:
+    - id
+    - source_team
+    - target_team
+    - runner_pattern
+    - actions
+
+RbacCrossTeamGrantInput:
+  type: object
+  properties:
+    source_team:
+      type: string
+      example: platform
+    target_team:
+      type: string
+      example: app-team
+    runner_pattern:
+      type: string
+      example: 'lex-node.*'
+    actions:
+      type: array
+      items:
+        type: string
+      example:
+        - read
+    expires_at:
+      type: string
+      format: date-time
+      description: Optional expiry for time-limited grants
+  required:
+    - source_team
+    - target_team
+    - runner_pattern
+    - actions
+
+RbacCrossTeamGrantResponse:
+  type: object
+  properties:
+    data:
+      $ref: './rbac.yaml#/RbacCrossTeamGrantObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RbacCrossTeamGrantCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './rbac.yaml#/RbacCrossTeamGrantObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta

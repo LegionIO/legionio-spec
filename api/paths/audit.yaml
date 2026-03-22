@@ -1,0 +1,132 @@
+/api/audit:
+  get:
+    tags:
+      - Audit
+    summary: List audit log entries
+    description: >
+      Returns a paginated list of audit log entries ordered by id descending.
+      Optionally filtered by event_type, principal_id, source, status, since, or until.
+      Requires legion-data to be connected.
+    operationId: listAuditLog
+    parameters:
+      - name: event_type
+        in: query
+        required: false
+        schema:
+          type: string
+          example: task.created
+        description: Filter by event type
+      - name: principal_id
+        in: query
+        required: false
+        schema:
+          type: string
+          example: jane.doe@example.com
+        description: Filter by principal identifier
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+          example: api
+        description: Filter by event source
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          example: success
+        description: Filter by event status
+      - name: since
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: '2026-01-01T00:00:00Z'
+        description: Return entries created at or after this timestamp
+      - name: until
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: '2026-12-31T23:59:59Z'
+        description: Return entries created at or before this timestamp
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          example: 50
+        description: Maximum number of results to return
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          example: 0
+        description: Number of results to skip
+    responses:
+      '200':
+        description: Audit log entries
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/audit.yaml#/AuditLogCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/audit/verify:
+  get:
+    tags:
+      - Audit
+    summary: Verify audit chain integrity
+    description: >
+      Runs tamper-evident hash chain verification via lex-audit.
+      Returns verification result including whether the chain is intact and where
+      it breaks if not. Returns 503 if lex-audit is not loaded.
+    operationId: verifyAuditChain
+    responses:
+      '200':
+        description: Audit chain verification result
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/audit.yaml#/AuditVerifyResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-audit not loaded or legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

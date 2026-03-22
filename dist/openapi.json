@@ -4978,6 +4978,1493 @@
           }
         }
       }
+    },
+    "/api/rbac/roles": {
+      "get": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "List roles",
+        "description": "Returns all registered RBAC roles with name, description, and cross_team flag. Returns 501 if legion-rbac is not installed.\n",
+        "operationId": "listRoles",
+        "responses": {
+          "200": {
+            "description": "Role list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/roles/{name}": {
+      "get": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Get a role",
+        "description": "Returns a single role by name, including its permissions and deny rules. Returns 404 if the role does not exist, 501 if legion-rbac is not installed.\n",
+        "operationId": "getRole",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "operator"
+            },
+            "description": "Role name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Role not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/check": {
+      "post": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Check access",
+        "description": "Evaluates a permission check via Legion::Rbac::PolicyEngine without enforcing. Returns the policy evaluation result. Returns 501 if legion-rbac is not installed.\n",
+        "operationId": "checkRbac",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RbacCheckInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Policy evaluation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RbacCheckResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/assignments": {
+      "get": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "List role assignments",
+        "description": "Returns all RBAC role assignments ordered by id. Optionally filtered by team, role, or principal. Returns 501 if legion-rbac is not installed, 503 if legion-data is not connected.\n",
+        "operationId": "listRbacAssignments",
+        "parameters": [
+          {
+            "name": "team",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "platform"
+            },
+            "description": "Filter by team"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "operator"
+            },
+            "description": "Filter by role name"
+          },
+          {
+            "name": "principal",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "jane.doe@example.com"
+            },
+            "description": "Filter by principal_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Assignment list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RbacAssignmentCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Create a role assignment",
+        "description": "Assigns a role to a principal. Principal type defaults to human. Optionally scoped to a team and/or given an expiry. Returns 422 on validation failure, 501/503 if dependencies unavailable.\n",
+        "operationId": "createRbacAssignment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RbacAssignmentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Assignment created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RbacAssignmentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/assignments/{id}": {
+      "delete": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Delete a role assignment",
+        "description": "Removes a role assignment by id. Returns 404 if the assignment does not exist, 501/503 if dependencies unavailable.\n",
+        "operationId": "deleteRbacAssignment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Assignment id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Assignment deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Assignment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/grants": {
+      "get": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "List runner grants",
+        "description": "Returns all RBAC runner grants ordered by id. Optionally filtered by team. Returns 501 if legion-rbac is not installed, 503 if legion-data is not connected.\n",
+        "operationId": "listRbacGrants",
+        "parameters": [
+          {
+            "name": "team",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "platform"
+            },
+            "description": "Filter by team"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Grant list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RbacGrantCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Create a runner grant",
+        "description": "Grants a team access to runners matching a pattern with specified actions. Actions are stored as a comma-separated string. Returns 422 on validation failure, 501/503 if dependencies unavailable.\n",
+        "operationId": "createRbacGrant",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RbacGrantInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Grant created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RbacGrantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/grants/{id}": {
+      "delete": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Delete a runner grant",
+        "description": "Removes a runner grant by id. Returns 404 if the grant does not exist, 501/503 if dependencies unavailable.\n",
+        "operationId": "deleteRbacGrant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Grant id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Grant deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Grant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/grants/cross-team": {
+      "get": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "List cross-team grants",
+        "description": "Returns all cross-team RBAC grants ordered by id. Returns 501 if legion-rbac is not installed, 503 if legion-data is not connected.\n",
+        "operationId": "listCrossTeamGrants",
+        "responses": {
+          "200": {
+            "description": "Cross-team grant list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RbacCrossTeamGrantCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Create a cross-team grant",
+        "description": "Grants a source team the ability to invoke runners in a target team matching a pattern with specified actions. Optionally time-limited via expires_at. Returns 422 on validation failure, 501/503 if dependencies unavailable.\n",
+        "operationId": "createCrossTeamGrant",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RbacCrossTeamGrantInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cross-team grant created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RbacCrossTeamGrantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/grants/cross-team/{id}": {
+      "delete": {
+        "tags": [
+          "RBAC"
+        ],
+        "summary": "Delete a cross-team grant",
+        "description": "Removes a cross-team grant by id. Returns 404 if the grant does not exist, 501/503 if dependencies unavailable.\n",
+        "operationId": "deleteCrossTeamGrant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Cross-team grant id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cross-team grant deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Grant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "legion-rbac not installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/audit": {
+      "get": {
+        "tags": [
+          "Audit"
+        ],
+        "summary": "List audit log entries",
+        "description": "Returns a paginated list of audit log entries ordered by id descending. Optionally filtered by event_type, principal_id, source, status, since, or until. Requires legion-data to be connected.\n",
+        "operationId": "listAuditLog",
+        "parameters": [
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "task.created"
+            },
+            "description": "Filter by event type"
+          },
+          {
+            "name": "principal_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "jane.doe@example.com"
+            },
+            "description": "Filter by principal identifier"
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "api"
+            },
+            "description": "Filter by event source"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "success"
+            },
+            "description": "Filter by event status"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-01T00:00:00Z"
+            },
+            "description": "Return entries created at or after this timestamp"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-12-31T23:59:59Z"
+            },
+            "description": "Return entries created at or before this timestamp"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "example": 50
+            },
+            "description": "Maximum number of results to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "example": 0
+            },
+            "description": "Number of results to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit log entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/audit/verify": {
+      "get": {
+        "tags": [
+          "Audit"
+        ],
+        "summary": "Verify audit chain integrity",
+        "description": "Runs tamper-evident hash chain verification via lex-audit. Returns verification result including whether the chain is intact and where it breaks if not. Returns 503 if lex-audit is not loaded.\n",
+        "operationId": "verifyAuditChain",
+        "responses": {
+          "200": {
+            "description": "Audit chain verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditVerifyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-audit not loaded or legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/governance/approvals": {
+      "get": {
+        "tags": [
+          "Governance"
+        ],
+        "summary": "List pending approvals",
+        "description": "Returns a list of pending approval requests via lex-audit ApprovalQueue. Optionally filtered by tenant_id and limited in count. Returns 503 if lex-audit is not available or legion-data is not connected.\n",
+        "operationId": "listApprovals",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acme"
+            },
+            "description": "Filter by tenant id"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "example": 20
+            },
+            "description": "Maximum number of results to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pending approvals list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-audit not available or legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Governance"
+        ],
+        "summary": "Submit an approval request",
+        "description": "Submits a new approval request via lex-audit ApprovalQueue. Requires approval_type and requester_id. Returns 422 if either is missing. Returns 503 if lex-audit is not available or legion-data is not connected.\n",
+        "operationId": "submitApproval",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Approval request submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing required field",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-audit not available or legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/governance/approvals/{id}": {
+      "get": {
+        "tags": [
+          "Governance"
+        ],
+        "summary": "Get an approval request",
+        "description": "Returns a single approval request by id via lex-audit ApprovalQueue. Returns 404 if not found, 503 if lex-audit is not available.\n",
+        "operationId": "getApproval",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Approval request id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Approval request detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Approval not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-audit not available or legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/governance/approvals/{id}/approve": {
+      "put": {
+        "tags": [
+          "Governance"
+        ],
+        "summary": "Approve a request",
+        "description": "Approves a pending approval request by id via lex-audit ApprovalQueue. Requires reviewer_id. Returns 422 if missing, 503 if dependencies unavailable.\n",
+        "operationId": "approveRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Approval request id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalReviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Approval accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing reviewer_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-audit not available or legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/governance/approvals/{id}/reject": {
+      "put": {
+        "tags": [
+          "Governance"
+        ],
+        "summary": "Reject a request",
+        "description": "Rejects a pending approval request by id via lex-audit ApprovalQueue. Requires reviewer_id. Returns 422 if missing, 503 if dependencies unavailable.\n",
+        "operationId": "rejectRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Approval request id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalReviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Approval rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing reviewer_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-audit not available or legion-data not connected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6958,6 +8445,723 @@
             "description": "Always \"worker\" for machine tokens"
           }
         }
+      },
+      "RoleObject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "operator"
+          },
+          "description": {
+            "type": "string",
+            "example": "Can read and trigger tasks"
+          },
+          "cross_team": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "cross_team"
+        ]
+      },
+      "RoleDetailObject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "operator"
+          },
+          "description": {
+            "type": "string",
+            "example": "Can read and trigger tasks"
+          },
+          "cross_team": {
+            "type": "boolean",
+            "example": false
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePermission"
+            }
+          },
+          "deny_rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleDenyRule"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "cross_team",
+          "permissions",
+          "deny_rules"
+        ]
+      },
+      "RoleCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "Map of role name to role summary object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RoleObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RoleResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RoleDetailObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RbacCheckInput": {
+        "type": "object",
+        "properties": {
+          "principal": {
+            "type": "string",
+            "description": "Principal identifier (defaults to anonymous)",
+            "example": "jane.doe@example.com"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "operator"
+            ]
+          },
+          "team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "action": {
+            "type": "string",
+            "description": "Action to check (defaults to read)",
+            "example": "write"
+          },
+          "resource": {
+            "type": "string",
+            "description": "Resource pattern to check (defaults to *)",
+            "example": "tasks/42"
+          }
+        }
+      },
+      "RbacCheckResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "Policy evaluation result from Legion::Rbac::PolicyEngine"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RbacAssignmentObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "principal_type": {
+            "type": "string",
+            "example": "human"
+          },
+          "principal_id": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "role": {
+            "type": "string",
+            "example": "operator"
+          },
+          "team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "granted_by": {
+            "type": "string",
+            "example": "admin@example.com"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "principal_type",
+          "principal_id",
+          "role"
+        ]
+      },
+      "RbacAssignmentInput": {
+        "type": "object",
+        "properties": {
+          "principal_type": {
+            "type": "string",
+            "description": "Type of principal (defaults to human)",
+            "example": "human"
+          },
+          "principal_id": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "role": {
+            "type": "string",
+            "example": "operator"
+          },
+          "team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Optional expiry for time-limited assignments"
+          }
+        },
+        "required": [
+          "principal_id",
+          "role"
+        ]
+      },
+      "RbacAssignmentResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RbacAssignmentObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RbacAssignmentCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RbacAssignmentObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RbacGrantObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "runner_pattern": {
+            "type": "string",
+            "example": "lex-node.*"
+          },
+          "actions": {
+            "type": "string",
+            "description": "Comma-separated action list",
+            "example": "read,write"
+          },
+          "granted_by": {
+            "type": "string",
+            "example": "admin@example.com"
+          }
+        },
+        "required": [
+          "id",
+          "team",
+          "runner_pattern",
+          "actions"
+        ]
+      },
+      "RbacGrantInput": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "runner_pattern": {
+            "type": "string",
+            "example": "lex-node.*"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "read",
+              "write"
+            ]
+          }
+        },
+        "required": [
+          "team",
+          "runner_pattern",
+          "actions"
+        ]
+      },
+      "RbacGrantResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RbacGrantObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RbacGrantCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RbacGrantObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RbacCrossTeamGrantObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "source_team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "target_team": {
+            "type": "string",
+            "example": "app-team"
+          },
+          "runner_pattern": {
+            "type": "string",
+            "example": "lex-node.*"
+          },
+          "actions": {
+            "type": "string",
+            "description": "Comma-separated action list",
+            "example": "read"
+          },
+          "granted_by": {
+            "type": "string",
+            "example": "admin@example.com"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "source_team",
+          "target_team",
+          "runner_pattern",
+          "actions"
+        ]
+      },
+      "RbacCrossTeamGrantInput": {
+        "type": "object",
+        "properties": {
+          "source_team": {
+            "type": "string",
+            "example": "platform"
+          },
+          "target_team": {
+            "type": "string",
+            "example": "app-team"
+          },
+          "runner_pattern": {
+            "type": "string",
+            "example": "lex-node.*"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "read"
+            ]
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Optional expiry for time-limited grants"
+          }
+        },
+        "required": [
+          "source_team",
+          "target_team",
+          "runner_pattern",
+          "actions"
+        ]
+      },
+      "RbacCrossTeamGrantResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RbacCrossTeamGrantObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RbacCrossTeamGrantCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RbacCrossTeamGrantObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AuditLogObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "event_type": {
+            "type": "string",
+            "example": "task.created"
+          },
+          "principal_id": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "source": {
+            "type": "string",
+            "example": "api"
+          },
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "payload": {
+            "type": "object",
+            "description": "Event-specific payload"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "event_type"
+        ]
+      },
+      "AuditLogCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AuditVerifyResult": {
+        "type": "object",
+        "description": "Result of tamper-evident hash chain verification from lex-audit",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "example": true
+          },
+          "checked": {
+            "type": "integer",
+            "description": "Number of audit entries checked",
+            "example": 1024
+          },
+          "broken_at": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID of first entry where chain is broken (null if valid)"
+          },
+          "message": {
+            "type": "string",
+            "example": "Audit chain is intact"
+          }
+        }
+      },
+      "AuditVerifyResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AuditVerifyResult"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ApprovalObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "approval_type": {
+            "type": "string",
+            "example": "worker.create"
+          },
+          "requester_id": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "reviewer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "reviewer@example.com"
+          },
+          "tenant_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "acme"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "example": "pending"
+          },
+          "payload": {
+            "type": "object",
+            "description": "Approval-type-specific payload"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "approval_type",
+          "requester_id",
+          "status"
+        ]
+      },
+      "ApprovalInput": {
+        "type": "object",
+        "properties": {
+          "approval_type": {
+            "type": "string",
+            "example": "worker.create"
+          },
+          "requester_id": {
+            "type": "string",
+            "example": "jane.doe@example.com"
+          },
+          "tenant_id": {
+            "type": "string",
+            "example": "acme"
+          },
+          "payload": {
+            "type": "object",
+            "description": "Approval-type-specific payload"
+          }
+        },
+        "required": [
+          "approval_type",
+          "requester_id"
+        ]
+      },
+      "ApprovalReviewInput": {
+        "type": "object",
+        "properties": {
+          "reviewer_id": {
+            "type": "string",
+            "example": "reviewer@example.com"
+          }
+        },
+        "required": [
+          "reviewer_id"
+        ]
+      },
+      "ApprovalResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ApprovalObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ApprovalCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApprovalObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RolePermission": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "example": "tasks/*"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "read",
+              "write"
+            ]
+          }
+        },
+        "required": [
+          "resource",
+          "actions"
+        ]
+      },
+      "RoleDenyRule": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "example": "admin/*"
+          },
+          "above_level": {
+            "type": "integer",
+            "example": 2
+          }
+        },
+        "required": [
+          "resource"
+        ]
       }
     }
   }

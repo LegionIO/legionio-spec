@@ -1,0 +1,603 @@
+/api/rbac/roles:
+  get:
+    tags:
+      - RBAC
+    summary: List roles
+    description: >
+      Returns all registered RBAC roles with name, description, and cross_team flag.
+      Returns 501 if legion-rbac is not installed.
+    operationId: listRoles
+    responses:
+      '200':
+        description: Role list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RoleCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/roles/{name}:
+  get:
+    tags:
+      - RBAC
+    summary: Get a role
+    description: >
+      Returns a single role by name, including its permissions and deny rules.
+      Returns 404 if the role does not exist, 501 if legion-rbac is not installed.
+    operationId: getRole
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          example: operator
+        description: Role name
+    responses:
+      '200':
+        description: Role detail
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RoleResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Role not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/check:
+  post:
+    tags:
+      - RBAC
+    summary: Check access
+    description: >
+      Evaluates a permission check via Legion::Rbac::PolicyEngine without enforcing.
+      Returns the policy evaluation result. Returns 501 if legion-rbac is not installed.
+    operationId: checkRbac
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/rbac.yaml#/RbacCheckInput'
+    responses:
+      '200':
+        description: Policy evaluation result
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RbacCheckResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/assignments:
+  get:
+    tags:
+      - RBAC
+    summary: List role assignments
+    description: >
+      Returns all RBAC role assignments ordered by id.
+      Optionally filtered by team, role, or principal.
+      Returns 501 if legion-rbac is not installed, 503 if legion-data is not connected.
+    operationId: listRbacAssignments
+    parameters:
+      - name: team
+        in: query
+        required: false
+        schema:
+          type: string
+          example: platform
+        description: Filter by team
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+          example: operator
+        description: Filter by role name
+      - name: principal
+        in: query
+        required: false
+        schema:
+          type: string
+          example: jane.doe@example.com
+        description: Filter by principal_id
+    responses:
+      '200':
+        description: Assignment list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RbacAssignmentCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - RBAC
+    summary: Create a role assignment
+    description: >
+      Assigns a role to a principal. Principal type defaults to human.
+      Optionally scoped to a team and/or given an expiry.
+      Returns 422 on validation failure, 501/503 if dependencies unavailable.
+    operationId: createRbacAssignment
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/rbac.yaml#/RbacAssignmentInput'
+    responses:
+      '201':
+        description: Assignment created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RbacAssignmentResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Validation failed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/assignments/{id}:
+  delete:
+    tags:
+      - RBAC
+    summary: Delete a role assignment
+    description: >
+      Removes a role assignment by id.
+      Returns 404 if the assignment does not exist, 501/503 if dependencies unavailable.
+    operationId: deleteRbacAssignment
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Assignment id
+    responses:
+      '200':
+        description: Assignment deleted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/DeletedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Assignment not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/grants:
+  get:
+    tags:
+      - RBAC
+    summary: List runner grants
+    description: >
+      Returns all RBAC runner grants ordered by id.
+      Optionally filtered by team.
+      Returns 501 if legion-rbac is not installed, 503 if legion-data is not connected.
+    operationId: listRbacGrants
+    parameters:
+      - name: team
+        in: query
+        required: false
+        schema:
+          type: string
+          example: platform
+        description: Filter by team
+    responses:
+      '200':
+        description: Grant list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RbacGrantCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - RBAC
+    summary: Create a runner grant
+    description: >
+      Grants a team access to runners matching a pattern with specified actions.
+      Actions are stored as a comma-separated string.
+      Returns 422 on validation failure, 501/503 if dependencies unavailable.
+    operationId: createRbacGrant
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/rbac.yaml#/RbacGrantInput'
+    responses:
+      '201':
+        description: Grant created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RbacGrantResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Validation failed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/grants/{id}:
+  delete:
+    tags:
+      - RBAC
+    summary: Delete a runner grant
+    description: >
+      Removes a runner grant by id.
+      Returns 404 if the grant does not exist, 501/503 if dependencies unavailable.
+    operationId: deleteRbacGrant
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Grant id
+    responses:
+      '200':
+        description: Grant deleted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/DeletedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Grant not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/grants/cross-team:
+  get:
+    tags:
+      - RBAC
+    summary: List cross-team grants
+    description: >
+      Returns all cross-team RBAC grants ordered by id.
+      Returns 501 if legion-rbac is not installed, 503 if legion-data is not connected.
+    operationId: listCrossTeamGrants
+    responses:
+      '200':
+        description: Cross-team grant list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RbacCrossTeamGrantCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - RBAC
+    summary: Create a cross-team grant
+    description: >
+      Grants a source team the ability to invoke runners in a target team matching
+      a pattern with specified actions. Optionally time-limited via expires_at.
+      Returns 422 on validation failure, 501/503 if dependencies unavailable.
+    operationId: createCrossTeamGrant
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/rbac.yaml#/RbacCrossTeamGrantInput'
+    responses:
+      '201':
+        description: Cross-team grant created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/rbac.yaml#/RbacCrossTeamGrantResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Validation failed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/rbac/grants/cross-team/{id}:
+  delete:
+    tags:
+      - RBAC
+    summary: Delete a cross-team grant
+    description: >
+      Removes a cross-team grant by id.
+      Returns 404 if the grant does not exist, 501/503 if dependencies unavailable.
+    operationId: deleteCrossTeamGrant
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Cross-team grant id
+    responses:
+      '200':
+        description: Cross-team grant deleted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/DeletedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Grant not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: legion-rbac not installed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

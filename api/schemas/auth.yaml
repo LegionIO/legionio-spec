@@ -1,0 +1,105 @@
+# POST /api/auth/token — RFC 8693 token exchange (human token via Entra JWKS)
+TokenExchangeRequest:
+  type: object
+  required:
+    - grant_type
+    - subject_token
+  properties:
+    grant_type:
+      type: string
+      enum:
+        - 'urn:ietf:params:oauth:grant-type:token-exchange'
+      description: Must be the RFC 8693 token exchange grant type
+      example: 'urn:ietf:params:oauth:grant-type:token-exchange'
+    subject_token:
+      type: string
+      description: A valid Microsoft Entra ID JWT to exchange for a Legion token
+      example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# POST /api/auth/worker-token — client_credentials worker token
+WorkerTokenRequest:
+  type: object
+  required:
+    - grant_type
+    - entra_token
+  properties:
+    grant_type:
+      type: string
+      enum:
+        - client_credentials
+      description: Must be client_credentials
+      example: client_credentials
+    entra_token:
+      type: string
+      description: A valid Microsoft Entra ID JWT issued to the worker app registration
+      example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Shared human token response (auth/token, auth/callback, auth/saml/acs)
+HumanTokenResponse:
+  type: object
+  required:
+    - access_token
+    - token_type
+    - expires_in
+    - roles
+  properties:
+    access_token:
+      type: string
+      description: Legion-issued JWT for the authenticated human
+      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    token_type:
+      type: string
+      enum:
+        - Bearer
+    expires_in:
+      type: integer
+      description: Token lifetime in seconds
+      example: 28800
+    roles:
+      type: array
+      items:
+        type: string
+      description: RBAC roles assigned to the user
+      example:
+        - operator
+        - viewer
+    team:
+      type: string
+      description: Team the user belongs to (present on token exchange, may be null)
+      example: platform
+    name:
+      type: string
+      description: Display name of the authenticated user (present on OAuth callback and SAML ACS)
+      example: Jane Doe
+
+# Worker token response (auth/worker-token)
+WorkerTokenResponse:
+  type: object
+  required:
+    - access_token
+    - token_type
+    - expires_in
+    - worker_id
+    - scope
+  properties:
+    access_token:
+      type: string
+      description: Legion-issued JWT for the digital worker
+      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    token_type:
+      type: string
+      enum:
+        - Bearer
+    expires_in:
+      type: integer
+      description: Token lifetime in seconds
+      example: 3600
+    worker_id:
+      type: string
+      description: Internal worker identifier
+      example: wkr_abc123
+    scope:
+      type: string
+      enum:
+        - worker
+      description: Always "worker" for machine tokens

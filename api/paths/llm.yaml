@@ -1,0 +1,84 @@
+/api/llm/chat:
+  post:
+    tags:
+      - LLM
+    summary: Chat with LLM
+    description: >
+      Sends a message to the LLM and returns a response. The response shape depends on
+      which routing path handles the request:
+
+      - **200** — Tier 0 pattern cache hit (Legion::MCP::TierRouter). Returns immediately
+        with `response`, `tier: 0`, `latency_ms`, and `pattern_confidence`.
+
+      - **201** — Synchronous response from the gateway pipeline or a direct LLM call.
+        Returns `response` and a `meta` object with model, token counts, and routing info.
+
+      - **202** — Async queued. Returned when the cache is available and the
+        `X-Legion-Sync` header is not set to `true`. Returns a `request_id` and
+        `poll_key` to check completion status via the cache.
+
+      Requires the LLM subsystem to be started. Returns 503 if unavailable.
+    operationId: chatLlm
+    security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/llm.yaml#/LlmChatRequest'
+    parameters:
+      - name: X-Legion-Sync
+        in: header
+        required: false
+        schema:
+          type: string
+          enum:
+            - 'true'
+        description: >
+          Set to `true` to force a synchronous response even when the cache is available.
+          Without this header the endpoint may return 202 and queue the request asynchronously.
+    responses:
+      '200':
+        description: Tier 0 pattern cache hit — response served without calling an LLM
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/llm.yaml#/LlmChatTier0Response'
+      '201':
+        description: Synchronous LLM response (gateway pipeline or direct call)
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/llm.yaml#/LlmChatSyncResponse'
+      '202':
+        description: Request accepted and queued asynchronously
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/llm.yaml#/LlmChatAsyncResponse'
+      '400':
+        description: Missing required field (message)
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '502':
+        description: Gateway pipeline error or LLM provider error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: LLM subsystem is not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

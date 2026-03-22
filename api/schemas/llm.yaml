@@ -1,0 +1,101 @@
+LlmChatRequest:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: The prompt or message to send to the LLM
+      example: What is the capital of France?
+    model:
+      type: string
+      description: Optional model name override
+      example: claude-3-5-sonnet-20241022
+    provider:
+      type: string
+      description: Optional provider override (e.g. claude, openai, bedrock, gemini)
+      example: claude
+    request_id:
+      type: string
+      format: uuid
+      description: Optional idempotency key; server generates one if omitted
+      example: 550e8400-e29b-41d4-a716-446655440000
+
+LlmMeta:
+  type: object
+  properties:
+    model:
+      type: string
+      description: Model name used to generate the response
+      example: claude-3-5-sonnet-20241022
+    tokens_in:
+      type: integer
+      description: Input token count
+      example: 12
+    tokens_out:
+      type: integer
+      description: Output token count
+      example: 48
+    routed_via:
+      type: string
+      description: Routing path used (gateway, direct, etc.)
+      example: gateway
+
+# 200 — Tier 0 cached / pattern-matched response
+LlmChatTier0Response:
+  type: object
+  required:
+    - response
+    - tier
+    - latency_ms
+    - pattern_confidence
+  properties:
+    response:
+      type: string
+      description: The LLM response text
+      example: Paris
+    tier:
+      type: integer
+      enum: [0]
+      description: Always 0 for Tier 0 pattern cache hits
+    latency_ms:
+      type: number
+      description: Time in milliseconds to serve the response from cache
+      example: 2.4
+    pattern_confidence:
+      type: number
+      format: float
+      minimum: 0
+      maximum: 1
+      description: Confidence score of the matched pattern
+      example: 0.97
+
+# 201 — Synchronous gateway or direct LLM response
+LlmChatSyncResponse:
+  type: object
+  required:
+    - response
+  properties:
+    response:
+      type: string
+      description: The LLM response text
+      example: Paris is the capital of France.
+    meta:
+      $ref: '#/LlmMeta'
+
+# 202 — Async queued response
+LlmChatAsyncResponse:
+  type: object
+  required:
+    - request_id
+    - poll_key
+  properties:
+    request_id:
+      type: string
+      format: uuid
+      description: Unique identifier for the queued request
+      example: 550e8400-e29b-41d4-a716-446655440000
+    poll_key:
+      type: string
+      description: Cache key to poll for completion status
+      example: "llm:550e8400-e29b-41d4-a716-446655440000:status"

@@ -1,0 +1,365 @@
+/api/auth/token:
+  post:
+    tags:
+      - Auth
+    summary: Exchange Entra token for Legion human token
+    description: >
+      Implements RFC 8693 token exchange. Accepts a Microsoft Entra ID JWT as
+      `subject_token`, verifies it via JWKS, maps claims to Legion RBAC roles,
+      and returns a Legion-issued Bearer token valid for 8 hours.
+
+      Requires `legion-crypt` with JWKS support and `legion-rbac` with
+      `EntraClaimsMapper`. The Entra `tenant_id` must be configured under
+      `rbac.entra.tenant_id` in Legion settings.
+    operationId: exchangeToken
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/auth.yaml#/TokenExchangeRequest'
+    responses:
+      '200':
+        description: Legion human token issued
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/auth.yaml#/HumanTokenResponse'
+      '400':
+        description: Unsupported grant_type or missing subject_token
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Entra token is expired or invalid
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Server misconfiguration (tenant_id not set)
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: JWKS validation or claims mapper not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '502':
+        description: Identity provider (Entra JWKS endpoint) unreachable
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/auth/worker-token:
+  post:
+    tags:
+      - Auth
+    summary: Exchange Entra token for Legion worker token
+    description: >
+      Machine-to-machine token exchange for digital workers. Accepts a Microsoft
+      Entra ID JWT issued to the worker's app registration, verifies it via JWKS,
+      looks up the registered `DigitalWorker` record by `appid`/`azp` claim, and
+      returns a Legion-issued Bearer token valid for 1 hour.
+
+      The worker must exist in legion-data and be in `active` lifecycle state.
+      Requires `legion-crypt` JWKS support and `legion-data` to be connected.
+    operationId: getWorkerToken
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/auth.yaml#/WorkerTokenRequest'
+    responses:
+      '200':
+        description: Legion worker token issued
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/auth.yaml#/WorkerTokenResponse'
+      '400':
+        description: Unsupported grant_type or missing entra_token
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Entra token expired, invalid, or missing appid claim
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '403':
+        description: Worker exists but is not in active lifecycle state
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: No worker registered for the given Entra app ID
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Server misconfiguration (tenant_id not set)
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: JWKS validation not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '502':
+        description: Identity provider (Entra JWKS endpoint) unreachable
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: legion-data not connected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/auth/authorize:
+  get:
+    tags:
+      - Auth
+    summary: Initiate human OAuth authorization
+    description: >
+      Redirects the browser to the Microsoft Entra ID authorization endpoint to
+      begin the human OAuth 2.0 authorization code flow. A short-lived CSRF state
+      JWT is embedded in the redirect. On success, Entra redirects back to
+      `/api/auth/callback`.
+
+      Requires `rbac.entra.tenant_id`, `rbac.entra.client_id`, and
+      `rbac.entra.redirect_uri` to be configured in Legion settings.
+    operationId: authorizeHuman
+    security: []
+    responses:
+      '302':
+        description: Redirect to Entra authorization endpoint
+        headers:
+          Location:
+            schema:
+              type: string
+              format: uri
+            description: Full Entra OAuth authorize URL with client_id, redirect_uri, state, and scope
+      '500':
+        description: Entra OAuth settings are not configured
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/auth/callback:
+  get:
+    tags:
+      - Auth
+    summary: Handle human OAuth callback
+    description: >
+      Receives the authorization code from Entra after the user authenticates.
+      Validates the CSRF state token, exchanges the code for an id_token via
+      the Entra token endpoint, verifies the id_token via JWKS, maps claims to
+      Legion RBAC roles, and issues a Legion human token.
+
+      If the request `Accept` header includes `application/json`, the response
+      is a JSON token payload. Otherwise the browser is redirected to
+      `entra.success_redirect` (or `/api/health`) with the token appended as an
+      `#access_token=` fragment.
+    operationId: callbackHuman
+    security: []
+    parameters:
+      - name: code
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Authorization code returned by Entra
+      - name: state
+        in: query
+        required: false
+        schema:
+          type: string
+        description: CSRF state JWT issued by /api/auth/authorize
+      - name: error
+        in: query
+        required: false
+        schema:
+          type: string
+        description: OAuth error code returned by Entra on failure
+      - name: error_description
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Human-readable OAuth error description
+    responses:
+      '200':
+        description: Legion human token issued (JSON response when Accept includes application/json)
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/auth.yaml#/HumanTokenResponse'
+      '302':
+        description: Redirect with access_token fragment (browser flow)
+        headers:
+          Location:
+            schema:
+              type: string
+              format: uri
+      '400':
+        description: OAuth error, missing code, or invalid CSRF state
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: id_token verification failed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Entra OAuth settings are not configured
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '501':
+        description: EntraClaimsMapper not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '502':
+        description: Code exchange with Entra token endpoint failed
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/auth/saml/metadata:
+  get:
+    tags:
+      - Auth
+    summary: SAML SP metadata
+    description: >
+      Returns the SAML 2.0 Service Provider metadata XML document. Used by IdPs
+      to configure trust with this Legion node. Only available when SAML is
+      enabled (`auth.saml.enabled: true`) and `ruby-saml` gem is loaded.
+    operationId: samlMetadata
+    security: []
+    responses:
+      '200':
+        description: SP metadata XML
+        content:
+          application/xml:
+            schema:
+              type: string
+              description: SAML 2.0 SP metadata XML document
+      '503':
+        description: SAML SP is not configured or ruby-saml gem is not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/auth/saml/login:
+  get:
+    tags:
+      - Auth
+    summary: Initiate SAML login
+    description: >
+      Redirects the browser to the IdP SSO URL to begin the SAML 2.0
+      authentication flow. On success, the IdP posts a SAMLResponse to
+      `/api/auth/saml/acs`.
+
+      Requires `auth.saml.idp_sso_url` and `auth.saml.sp_entity_id` to be
+      configured in Legion settings.
+    operationId: initiateSaml
+    security: []
+    responses:
+      '302':
+        description: Redirect to IdP SSO URL
+        headers:
+          Location:
+            schema:
+              type: string
+              format: uri
+            description: IdP SSO URL with encoded AuthnRequest
+      '500':
+        description: SAML IdP SSO URL or SP entity ID not configured
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: SAML SP is not configured or ruby-saml gem is not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/auth/saml/acs:
+  post:
+    tags:
+      - Auth
+    summary: SAML Assertion Consumer Service
+    description: >
+      Receives the SAMLResponse posted by the IdP after successful authentication,
+      validates the assertion, extracts claims (nameid, email, display_name,
+      groups), maps groups to Legion RBAC roles, and issues a Legion human token
+      valid for 8 hours.
+    operationId: callbackSaml
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            required:
+              - SAMLResponse
+            properties:
+              SAMLResponse:
+                type: string
+                description: Base64-encoded SAML assertion from the IdP
+    responses:
+      '200':
+        description: Legion human token issued
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/auth.yaml#/HumanTokenResponse'
+      '400':
+        description: SAMLResponse parameter is missing
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: SAML assertion is invalid
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: SAML SP is not configured or ruby-saml gem is not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

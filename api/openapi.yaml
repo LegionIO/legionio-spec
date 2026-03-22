@@ -193,6 +193,24 @@ paths:
   /api/lex/{path}:
     $ref: './paths/lex.yaml#/~1api~1lex~1{path}'
 
+  /api/llm/chat:
+    $ref: './paths/llm.yaml#/~1api~1llm~1chat'
+
+  /api/auth/token:
+    $ref: './paths/auth.yaml#/~1api~1auth~1token'
+  /api/auth/worker-token:
+    $ref: './paths/auth.yaml#/~1api~1auth~1worker-token'
+  /api/auth/authorize:
+    $ref: './paths/auth.yaml#/~1api~1auth~1authorize'
+  /api/auth/callback:
+    $ref: './paths/auth.yaml#/~1api~1auth~1callback'
+  /api/auth/saml/metadata:
+    $ref: './paths/auth.yaml#/~1api~1auth~1saml~1metadata'
+  /api/auth/saml/login:
+    $ref: './paths/auth.yaml#/~1api~1auth~1saml~1login'
+  /api/auth/saml/acs:
+    $ref: './paths/auth.yaml#/~1api~1auth~1saml~1acs'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -361,3 +379,25 @@ components:
       $ref: './schemas/transport.yaml#/PublishResult'
     PublishResponse:
       $ref: './schemas/transport.yaml#/PublishResponse'
+
+    # LLM schemas
+    LlmChatRequest:
+      $ref: './schemas/llm.yaml#/LlmChatRequest'
+    LlmMeta:
+      $ref: './schemas/llm.yaml#/LlmMeta'
+    LlmChatTier0Response:
+      $ref: './schemas/llm.yaml#/LlmChatTier0Response'
+    LlmChatSyncResponse:
+      $ref: './schemas/llm.yaml#/LlmChatSyncResponse'
+    LlmChatAsyncResponse:
+      $ref: './schemas/llm.yaml#/LlmChatAsyncResponse'
+
+    # Auth schemas
+    TokenExchangeRequest:
+      $ref: './schemas/auth.yaml#/TokenExchangeRequest'
+    WorkerTokenRequest:
+      $ref: './schemas/auth.yaml#/WorkerTokenRequest'
+    HumanTokenResponse:
+      $ref: './schemas/auth.yaml#/HumanTokenResponse'
+    WorkerTokenResponse:
+      $ref: './schemas/auth.yaml#/WorkerTokenResponse'

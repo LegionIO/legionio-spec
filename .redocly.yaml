@@ -1,0 +1,7 @@
+extends:
+  - recommended
+
+rules:
+  no-unused-components: warn
+  operation-operationId-unique: error
+  path-not-include-query: error

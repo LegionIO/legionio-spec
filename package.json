@@ -1,0 +1,24 @@
+{
+  "name": "legionio-spec",
+  "version": "1.0.0",
+  "description": "Interface contract specs for LegionIO — OpenAPI, AMQP, DB, MCP.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LegionIO/legionio-spec.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/LegionIO/legionio-spec/issues"
+  },
+  "homepage": "https://github.com/LegionIO/legionio-spec#readme",
+  "devDependencies": {
+    "@redocly/cli": "^2.22.1"
+  }
+}

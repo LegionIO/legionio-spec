@@ -1,0 +1,114 @@
+openapi: '3.1.0'
+info:
+  title: LegionIO REST API
+  description: >
+    Async job engine and digital worker platform REST API.
+    All routes are under the /api/ prefix.
+    Success responses wrap data in { data: ..., meta: { timestamp, node } }.
+    Error responses use { error: { code, message }, meta: { timestamp, node } }.
+  version: 1.4.122
+  contact:
+    name: LegionIO
+    url: https://github.com/LegionIO/LegionIO
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:4567
+    description: Local Legion daemon
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+tags:
+  - name: Health
+    description: Health and readiness probes
+  - name: Tasks
+    description: Task management and execution
+  - name: Extensions
+    description: Extension, runner, and function discovery
+  - name: Nodes
+    description: Node registry
+  - name: Schedules
+    description: Cron/interval schedule management
+  - name: Relationships
+    description: Task relationships
+  - name: Chains
+    description: Task chains (stub)
+  - name: Settings
+    description: Runtime configuration
+  - name: Events
+    description: SSE event stream and recent event buffer
+  - name: Transport
+    description: RabbitMQ transport status and publish
+  - name: Hooks
+    description: Extension webhook endpoints
+  - name: Lex
+    description: Auto-registered LEX runner routes
+  - name: Workers
+    description: Digital worker lifecycle management
+  - name: Teams
+    description: Team-level worker and cost views
+  - name: LLM
+    description: LLM inference
+  - name: Auth
+    description: Authentication and token management
+  - name: RBAC
+    description: Role-based access control
+  - name: Audit
+    description: Audit log
+  - name: Capacity
+    description: Workforce capacity
+  - name: Tenants
+    description: Multi-tenant management
+  - name: Catalog
+    description: Extension catalog
+  - name: Webhooks
+    description: Webhook subscriptions
+  - name: Marketplace
+    description: Extension marketplace
+  - name: Governance
+    description: Approval workflows
+  - name: Prompts
+    description: Prompt management
+  - name: Coldstart
+    description: Cold-start memory ingestion
+  - name: Gaia
+    description: Gaia cognitive layer
+  - name: GraphQL
+    description: GraphQL API endpoint
+  - name: ACP
+    description: Agent Communication Protocol
+  - name: Metrics
+    description: Prometheus metrics
+
+paths:
+  /api/health:
+    $ref: './paths/health.yaml#/~1api~1health'
+  /api/ready:
+    $ref: './paths/health.yaml#/~1api~1ready'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Legion-issued JWT token (worker or human scope)
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Pre-shared API key
+
+  schemas:
+    Meta:
+      $ref: './schemas/common.yaml#/Meta'
+    MetaCollection:
+      $ref: './schemas/common.yaml#/MetaCollection'
+    ErrorResponse:
+      $ref: './schemas/common.yaml#/ErrorResponse'
+    DeletedResponse:
+      $ref: './schemas/common.yaml#/DeletedResponse'

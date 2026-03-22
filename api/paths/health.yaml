@@ -1,0 +1,63 @@
+/api/health:
+  get:
+    tags:
+      - Health
+    summary: Health check
+    description: Returns ok status and version. Skips auth middleware.
+    operationId: getHealth
+    security: []
+    responses:
+      '200':
+        description: Healthy
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: ok
+                    version:
+                      type: string
+                      example: 1.4.122
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+
+/api/ready:
+  get:
+    tags:
+      - Health
+    summary: Readiness check
+    description: >
+      Returns readiness status for all components.
+      Returns 503 if not ready. Skips auth middleware.
+    operationId: getReady
+    security: []
+    responses:
+      '200':
+        description: Ready
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    ready:
+                      type: boolean
+                    components:
+                      type: object
+                      additionalProperties:
+                        type: boolean
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '503':
+        description: Not ready
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

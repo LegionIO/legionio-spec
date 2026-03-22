@@ -1,0 +1,62 @@
+Meta:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+    node:
+      type: string
+  required:
+    - timestamp
+    - node
+
+MetaCollection:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+    node:
+      type: string
+    total:
+      type: integer
+    limit:
+      type: integer
+    offset:
+      type: integer
+  required:
+    - timestamp
+    - node
+    - total
+    - limit
+    - offset
+
+ErrorResponse:
+  type: object
+  properties:
+    error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    meta:
+      $ref: '#/Meta'
+  required:
+    - error
+    - meta
+
+DeletedResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+    meta:
+      $ref: '#/Meta'

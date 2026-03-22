@@ -1,0 +1,101 @@
+/api/nodes:
+  get:
+    tags:
+      - Nodes
+    summary: List nodes
+    description: >
+      Returns all registered nodes ordered by id.
+      Optionally filter by active status or node status string.
+    operationId: listNodes
+    parameters:
+      - name: active
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: ['true', 'false']
+          example: 'true'
+        description: When 'true', return only active nodes
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          example: online
+        description: Filter by node status
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          example: 20
+        description: Maximum number of results to return
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          example: 0
+        description: Number of results to skip
+    responses:
+      '200':
+        description: Node list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/node.yaml#/NodeCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/nodes/{id}:
+  get:
+    tags:
+      - Nodes
+    summary: Get a node
+    description: Returns a single node by id.
+    operationId: getNode
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1
+        description: Node id
+    responses:
+      '200':
+        description: Node detail
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/node.yaml#/NodeResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Node not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

@@ -1,0 +1,242 @@
+/api/tasks:
+  get:
+    tags:
+      - Tasks
+    summary: List tasks
+    description: >
+      Returns a paginated list of tasks ordered by id descending.
+      Optionally filtered by status or function_id.
+    operationId: listTasks
+    parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          example: complete
+        description: Filter by task status
+      - name: function_id
+        in: query
+        required: false
+        schema:
+          type: integer
+          example: 7
+        description: Filter by function id
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          example: 20
+        description: Maximum number of results to return
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          example: 0
+        description: Number of results to skip
+    responses:
+      '200':
+        description: Task list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/task.yaml#/TaskCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - Tasks
+    summary: Create a task
+    description: >
+      Dispatches a task via Legion::Ingress. Requires runner_class and function.
+      Additional keys in the request body are forwarded as the task payload.
+      Returns 422 if runner_class or function are missing or invalid.
+    operationId: createTask
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/task.yaml#/TaskInput'
+    responses:
+      '201':
+        description: Task created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/task.yaml#/TaskCreatedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing or invalid field
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/tasks/{id}:
+  get:
+    tags:
+      - Tasks
+    summary: Get a task
+    description: >
+      Returns a single task by id. Includes metering data (LLM token usage)
+      when metering records exist for this task.
+    operationId: getTask
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 42
+        description: Task id
+    responses:
+      '200':
+        description: Task detail
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/task.yaml#/TaskResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Task not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  delete:
+    tags:
+      - Tasks
+    summary: Delete a task
+    description: Deletes a task record by id.
+    operationId: deleteTask
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 42
+        description: Task id
+    responses:
+      '200':
+        description: Task deleted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/DeletedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Task not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/tasks/{id}/logs:
+  get:
+    tags:
+      - Tasks
+    summary: Get task logs
+    description: >
+      Returns all log entries for a task, ordered by id descending.
+      Returns 404 if the task does not exist.
+    operationId: getTaskLogs
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 42
+        description: Task id
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          example: 50
+        description: Maximum number of log entries to return
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          example: 0
+        description: Number of log entries to skip
+    responses:
+      '200':
+        description: Task log entries
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/task.yaml#/TaskLogCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Task not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

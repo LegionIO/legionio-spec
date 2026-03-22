@@ -90,6 +90,33 @@ paths:
   /api/ready:
     $ref: './paths/health.yaml#/~1api~1ready'
 
+  /api/tasks:
+    $ref: './paths/tasks.yaml#/~1api~1tasks'
+  /api/tasks/{id}:
+    $ref: './paths/tasks.yaml#/~1api~1tasks~1{id}'
+  /api/tasks/{id}/logs:
+    $ref: './paths/tasks.yaml#/~1api~1tasks~1{id}~1logs'
+
+  /api/extensions:
+    $ref: './paths/extensions.yaml#/~1api~1extensions'
+  /api/extensions/{id}:
+    $ref: './paths/extensions.yaml#/~1api~1extensions~1{id}'
+  /api/extensions/{id}/runners:
+    $ref: './paths/extensions.yaml#/~1api~1extensions~1{id}~1runners'
+  /api/extensions/{id}/runners/{runner_id}:
+    $ref: './paths/extensions.yaml#/~1api~1extensions~1{id}~1runners~1{runner_id}'
+  /api/extensions/{id}/runners/{runner_id}/functions:
+    $ref: './paths/extensions.yaml#/~1api~1extensions~1{id}~1runners~1{runner_id}~1functions'
+  /api/extensions/{id}/runners/{runner_id}/functions/{function_id}:
+    $ref: './paths/extensions.yaml#/~1api~1extensions~1{id}~1runners~1{runner_id}~1functions~1{function_id}'
+  /api/extensions/{id}/runners/{runner_id}/functions/{function_id}/invoke:
+    $ref: './paths/extensions.yaml#/~1api~1extensions~1{id}~1runners~1{runner_id}~1functions~1{function_id}~1invoke'
+
+  /api/nodes:
+    $ref: './paths/nodes.yaml#/~1api~1nodes'
+  /api/nodes/{id}:
+    $ref: './paths/nodes.yaml#/~1api~1nodes~1{id}'
+
 components:
   securitySchemes:
     BearerAuth:

@@ -147,6 +147,14 @@
     {
       "name": "Metrics",
       "description": "Prometheus metrics"
+    },
+    {
+      "name": "OrgChart",
+      "description": "Digital worker organization chart"
+    },
+    {
+      "name": "Workflow",
+      "description": "Task relationship graph"
     }
   ],
   "paths": {
@@ -7182,6 +7190,1693 @@
           }
         }
       }
+    },
+    "/api/marketplace": {
+      "get": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "List marketplace extensions",
+        "description": "Returns all extensions registered in the marketplace. Supports optional full-text search, status filter, and risk tier filter. Results are paginated using the standard limit/offset parameters.\n",
+        "operationId": "listMarketplace",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Full-text search query (alias for query)"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Full-text search query"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending_review",
+                "approved",
+                "rejected",
+                "deprecated"
+              ]
+            },
+            "description": "Filter by extension status"
+          },
+          {
+            "name": "tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "description": "Filter by AIRB risk tier"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Maximum number of results to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Number of results to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Marketplace extension list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/{name}": {
+      "get": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Get marketplace extension",
+        "description": "Returns the marketplace entry for a single extension by name, including usage stats.",
+        "operationId": "getMarketplaceEntry",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "lex-node"
+            },
+            "description": "Extension name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Marketplace extension entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/{name}/submit": {
+      "post": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Submit extension for review",
+        "description": "Transitions an extension into pending_review status.",
+        "operationId": "submitMarketplaceEntry",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Extension name"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Extension submitted for review",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/{name}/approve": {
+      "post": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Approve marketplace extension",
+        "description": "Approves an extension that is pending review, with optional reviewer notes.",
+        "operationId": "approveMarketplaceEntry",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Extension name"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceApproveInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extension approved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/{name}/reject": {
+      "post": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Reject marketplace extension",
+        "description": "Rejects an extension that is pending review, with a mandatory rejection reason.",
+        "operationId": "rejectMarketplaceEntry",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Extension name"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceRejectInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extension rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/{name}/deprecate": {
+      "post": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Deprecate marketplace extension",
+        "description": "Marks an extension as deprecated with an optional successor and sunset date.",
+        "operationId": "deprecateMarketplaceEntry",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Extension name"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketplaceDeprecateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extension deprecated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/{name}/stats": {
+      "get": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Get extension usage stats",
+        "description": "Returns usage statistics for a single marketplace extension.",
+        "operationId": "getMarketplaceStats",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Extension name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Extension usage statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceStatsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prompts": {
+      "get": {
+        "tags": [
+          "Prompts"
+        ],
+        "summary": "List prompts",
+        "description": "Returns all prompt definitions available from lex-prompt. Requires lex-prompt extension to be loaded; returns 503 otherwise.\n",
+        "operationId": "listPrompts",
+        "responses": {
+          "200": {
+            "description": "Prompt list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AnyObject"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-prompt extension not loaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prompts/{name}": {
+      "get": {
+        "tags": [
+          "Prompts"
+        ],
+        "summary": "Get prompt",
+        "description": "Returns a single prompt definition by name.",
+        "operationId": "getPrompt",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "summarize"
+            },
+            "description": "Prompt name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prompt definition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AnyObject"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Prompt not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-prompt extension not loaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prompts/{name}/run": {
+      "post": {
+        "tags": [
+          "Prompts"
+        ],
+        "summary": "Run prompt",
+        "description": "Renders a prompt with the provided variables and executes it against the LLM subsystem. Requires both lex-prompt and legion-llm to be available.\n",
+        "operationId": "runPrompt",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "summarize"
+            },
+            "description": "Prompt name"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "variables": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Key/value pairs to interpolate into the prompt template"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Specific prompt version to render (default is latest)"
+                  },
+                  "model": {
+                    "type": "string",
+                    "description": "Model override (e.g. claude-3-5-sonnet-20241022)"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "description": "Provider override (e.g. claude, openai, bedrock)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Prompt executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "rendered_prompt": {
+                          "type": "string"
+                        },
+                        "response": {
+                          "type": "string"
+                        },
+                        "usage": {
+                          "type": "object",
+                          "properties": {
+                            "input_tokens": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "output_tokens": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "model": {
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Prompt not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing or unrenderable prompt variables",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "LLM subsystem or lex-prompt not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/coldstart/ingest": {
+      "post": {
+        "tags": [
+          "Coldstart"
+        ],
+        "summary": "Ingest file or directory into memory",
+        "description": "Triggers lex-coldstart to ingest a file or directory of context files (CLAUDE.md, MEMORY.md) into lex-memory. Requires both lex-coldstart and lex-memory extensions to be loaded. Accepts a single file path or a directory path with an optional glob pattern.\n",
+        "operationId": "coldstartIngest",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "path"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Absolute path to a file or directory to ingest",
+                    "example": "/home/user/projects/myapp"
+                  },
+                  "pattern": {
+                    "type": "string",
+                    "description": "Glob pattern for directory ingestion. Defaults to **/{CLAUDE,MEMORY}.md\n",
+                    "example": "**/{CLAUDE,MEMORY}.md"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ingest completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Ingest result summary (traces created, files processed)",
+                      "additionalProperties": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Path not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing required field (path)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "lex-coldstart or lex-memory not loaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gaia/status": {
+      "get": {
+        "tags": [
+          "Gaia"
+        ],
+        "summary": "Get Gaia status",
+        "description": "Returns the current status of the Gaia cognitive coordination layer. Returns 503 with started: false when Gaia is not running.\n",
+        "operationId": "getGaiaStatus",
+        "responses": {
+          "200": {
+            "description": "Gaia status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Gaia status object (shape varies by Gaia version)",
+                      "additionalProperties": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Gaia not started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "started": {
+                          "type": "boolean",
+                          "example": false
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/teams/webhook": {
+      "post": {
+        "tags": [
+          "Gaia"
+        ],
+        "summary": "Receive Microsoft Teams webhook",
+        "description": "Accepts an inbound Teams Bot Framework activity payload and routes it through the Gaia sensory buffer. Requires the Teams channel adapter to be registered in the Gaia channel registry. Returns 503 when the adapter is not available.\n",
+        "operationId": "teamsWebhook",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Teams Bot Framework Activity object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Activity accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "accepted"
+                        },
+                        "frame_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "GAIA InputFrame identifier"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Teams adapter not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/graphql": {
+      "post": {
+        "tags": [
+          "GraphQL"
+        ],
+        "summary": "Execute GraphQL query",
+        "description": "Executes a GraphQL query, mutation, or subscription against the Legion GraphQL schema. Requires the graphql gem to be present. Returns GraphQL-spec errors in the errors array on failure.\n",
+        "operationId": "executeGraphql",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query or mutation document",
+                    "example": "{ tasks { id status } }"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Variable values for the query"
+                  },
+                  "operationName": {
+                    "type": "string",
+                    "description": "Named operation to execute when the document contains multiple operations\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "GraphQL response (errors may still be present in the errors array)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "description": "GraphQL response data"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "query field is missing or empty",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "GraphQL"
+        ],
+        "summary": "GraphiQL explorer UI",
+        "description": "Serves the GraphiQL interactive browser-based IDE for exploring the Legion GraphQL schema.\n",
+        "operationId": "getGraphiql",
+        "responses": {
+          "200": {
+            "description": "GraphiQL HTML page",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/agent.json": {
+      "get": {
+        "tags": [
+          "ACP"
+        ],
+        "summary": "Agent card (A2A discovery)",
+        "description": "Returns the ACP agent.json discovery card describing this Legion node's identity, capabilities, supported input/output modes, and authentication requirements. Used by A2A-compatible orchestrators for agent discovery.\n",
+        "operationId": "getAgentCard",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "ACP agent card",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentCard"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/acp/tasks": {
+      "post": {
+        "tags": [
+          "ACP"
+        ],
+        "summary": "Submit ACP task",
+        "description": "Submits a task via the Agent Communication Protocol. The input payload is dispatched through Legion::Ingress with source=acp. Returns the task_id and initial queued status immediately (async).\n",
+        "operationId": "submitAcpTask",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcpTaskInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Task queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcpTaskQueuedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/acp/tasks/{id}": {
+      "get": {
+        "tags": [
+          "ACP"
+        ],
+        "summary": "Get ACP task status",
+        "description": "Returns the current status and output of an ACP task. Translates internal Legion task states to the ACP state vocabulary: queued, in_progress, completed, failed.\n",
+        "operationId": "getAcpTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Task ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ACP task status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcpTaskStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ACP"
+        ],
+        "summary": "Cancel ACP task",
+        "description": "Task cancellation is not yet implemented. Returns 501.",
+        "operationId": "cancelAcpTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Task ID"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "tags": [
+          "Metrics"
+        ],
+        "summary": "Prometheus metrics",
+        "description": "Exposes Prometheus metrics in the text exposition format (version 0.0.4). Gauges are refreshed on each request. Returns 404 plain text when the prometheus-client gem is not available. Note: this endpoint has no /api/ prefix and is unauthenticated to allow scraping by Prometheus.\n",
+        "operationId": "getMetrics",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Prometheus text exposition",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "# HELP legion_tasks_total Total tasks processed\n# TYPE legion_tasks_total counter\nlegion_tasks_total 42\n"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "prometheus-client gem not available",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "prometheus-client gem not available"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org-chart": {
+      "get": {
+        "tags": [
+          "OrgChart"
+        ],
+        "summary": "Get organization chart",
+        "description": "Returns a hierarchical view of extensions, their functions/roles, and the digital workers assigned to each. Requires legion-data to be connected. Returns 503 when the data subsystem is not available.\n",
+        "operationId": "getOrgChart",
+        "responses": {
+          "200": {
+            "description": "Organization chart",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "departments": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Extension name"
+                              },
+                              "roles": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "description": "Function/runner name"
+                                    },
+                                    "workers": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "integer"
+                                          },
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "status": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Data subsystem not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relationships/graph": {
+      "get": {
+        "tags": [
+          "Workflow"
+        ],
+        "summary": "Get relationship graph",
+        "description": "Returns a node/edge graph of task relationships. Optionally filtered by chain_id or extension name. Requires legion-data to be connected. Nodes represent tasks or runners; edges represent relationships between them.\n",
+        "operationId": "getRelationshipGraph",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter graph to a specific chain"
+          },
+          {
+            "name": "extension",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "lex-node"
+            },
+            "description": "Filter graph to nodes belonging to a specific extension"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relationship graph",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "nodes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "extension": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "edges": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "source": {
+                                "type": "string"
+                              },
+                              "target": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Data subsystem not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -10466,6 +12161,417 @@
             "items": {
               "$ref": "#/components/schemas/WebhookObject"
             }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AnyObject": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Arbitrary JSON object"
+      },
+      "MarketplaceEntryObject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Extension gem name",
+            "example": "lex-node"
+          },
+          "version": {
+            "type": "string",
+            "description": "Installed version",
+            "example": "0.3.2"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending_review",
+              "approved",
+              "rejected",
+              "deprecated"
+            ],
+            "description": "Marketplace approval status"
+          },
+          "risk_tier": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical",
+              null
+            ],
+            "description": "AIRB risk tier classification"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "successor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Replacement extension name (set when deprecated)"
+          },
+          "sunset_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Date after which the deprecated extension will be removed"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "MarketplaceEntryResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MarketplaceEntryObject"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "stats": {
+                    "$ref": "#/components/schemas/MarketplaceStatsObject"
+                  }
+                }
+              }
+            ]
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "MarketplaceCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MarketplaceEntryObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "MarketplaceStatsObject": {
+        "type": "object",
+        "properties": {
+          "invocations": {
+            "type": "integer",
+            "description": "Total invocation count"
+          },
+          "last_invoked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "error_count": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "MarketplaceStatsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MarketplaceStatsObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "MarketplaceStatusResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "entry": {
+                "$ref": "#/components/schemas/MarketplaceEntryObject"
+              }
+            },
+            "required": [
+              "name",
+              "status"
+            ]
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "MarketplaceApproveInput": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "Reviewer notes"
+          }
+        }
+      },
+      "MarketplaceRejectInput": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Rejection reason"
+          }
+        }
+      },
+      "MarketplaceDeprecateInput": {
+        "type": "object",
+        "properties": {
+          "successor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name of the replacement extension"
+          },
+          "sunset_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Date after which the extension will be removed (ISO 8601)"
+          }
+        }
+      },
+      "AgentCard": {
+        "type": "object",
+        "description": "ACP agent.json discovery card (A2A protocol)",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Agent/node name",
+            "example": "legion"
+          },
+          "description": {
+            "type": "string",
+            "example": "LegionIO digital worker"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Base URL for ACP task submissions",
+            "example": "http://localhost:4567/api/acp"
+          },
+          "version": {
+            "type": "string",
+            "example": "2.0"
+          },
+          "protocol": {
+            "type": "string",
+            "example": "acp/1.0"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of capability identifiers discovered from loaded extensions"
+          },
+          "authentication": {
+            "type": "object",
+            "properties": {
+              "schemes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "bearer"
+                ]
+              }
+            }
+          },
+          "defaultInputModes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "text/plain",
+              "application/json"
+            ]
+          },
+          "defaultOutputModes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "text/plain",
+              "application/json"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "url",
+          "version",
+          "protocol"
+        ]
+      },
+      "AcpTaskInput": {
+        "type": "object",
+        "description": "ACP task submission payload",
+        "properties": {
+          "runner_class": {
+            "type": "string",
+            "description": "Fully-qualified runner class name",
+            "example": "Legion::Extensions::Node::Runners::Status"
+          },
+          "function": {
+            "type": "string",
+            "description": "Runner function to invoke",
+            "example": "status"
+          },
+          "input": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Payload forwarded to the runner as kwargs"
+          }
+        },
+        "required": [
+          "runner_class",
+          "function"
+        ]
+      },
+      "AcpTaskQueuedResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "task_id": {
+                "type": "integer",
+                "description": "Internal Legion task ID"
+              },
+              "status": {
+                "type": "string",
+                "example": "queued"
+              }
+            },
+            "required": [
+              "task_id",
+              "status"
+            ]
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AcpTaskStatusResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "task_id": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "queued",
+                  "in_progress",
+                  "completed",
+                  "failed"
+                ],
+                "description": "ACP-normalized task state"
+              },
+              "output": {
+                "type": "object",
+                "description": "Task result data",
+                "additionalProperties": true
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "completed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "task_id",
+              "status"
+            ]
           },
           "meta": {
             "$ref": "#/components/schemas/Meta"

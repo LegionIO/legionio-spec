@@ -1,0 +1,329 @@
+/api/marketplace:
+  get:
+    tags:
+      - Marketplace
+    summary: List marketplace extensions
+    description: >
+      Returns all extensions registered in the marketplace. Supports optional
+      full-text search, status filter, and risk tier filter. Results are
+      paginated using the standard limit/offset parameters.
+    operationId: listMarketplace
+    parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Full-text search query (alias for query)
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Full-text search query
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [pending_review, approved, rejected, deprecated]
+        description: Filter by extension status
+      - name: tier
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [low, medium, high, critical]
+        description: Filter by AIRB risk tier
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+        description: Maximum number of results to return
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+        description: Number of results to skip
+    responses:
+      '200':
+        description: Marketplace extension list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/marketplace.yaml#/MarketplaceCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/marketplace/{name}:
+  get:
+    tags:
+      - Marketplace
+    summary: Get marketplace extension
+    description: Returns the marketplace entry for a single extension by name, including usage stats.
+    operationId: getMarketplaceEntry
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          example: lex-node
+        description: Extension name
+    responses:
+      '200':
+        description: Marketplace extension entry
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/marketplace.yaml#/MarketplaceEntryResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Extension not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/marketplace/{name}/submit:
+  post:
+    tags:
+      - Marketplace
+    summary: Submit extension for review
+    description: Transitions an extension into pending_review status.
+    operationId: submitMarketplaceEntry
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Extension name
+    responses:
+      '202':
+        description: Extension submitted for review
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/marketplace.yaml#/MarketplaceStatusResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Extension not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/marketplace/{name}/approve:
+  post:
+    tags:
+      - Marketplace
+    summary: Approve marketplace extension
+    description: Approves an extension that is pending review, with optional reviewer notes.
+    operationId: approveMarketplaceEntry
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Extension name
+    requestBody:
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/marketplace.yaml#/MarketplaceApproveInput'
+    responses:
+      '200':
+        description: Extension approved
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/marketplace.yaml#/MarketplaceStatusResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Extension not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/marketplace/{name}/reject:
+  post:
+    tags:
+      - Marketplace
+    summary: Reject marketplace extension
+    description: Rejects an extension that is pending review, with a mandatory rejection reason.
+    operationId: rejectMarketplaceEntry
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Extension name
+    requestBody:
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/marketplace.yaml#/MarketplaceRejectInput'
+    responses:
+      '200':
+        description: Extension rejected
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/marketplace.yaml#/MarketplaceStatusResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Extension not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/marketplace/{name}/deprecate:
+  post:
+    tags:
+      - Marketplace
+    summary: Deprecate marketplace extension
+    description: Marks an extension as deprecated with an optional successor and sunset date.
+    operationId: deprecateMarketplaceEntry
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Extension name
+    requestBody:
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/marketplace.yaml#/MarketplaceDeprecateInput'
+    responses:
+      '200':
+        description: Extension deprecated
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/marketplace.yaml#/MarketplaceStatusResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Extension not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/marketplace/{name}/stats:
+  get:
+    tags:
+      - Marketplace
+    summary: Get extension usage stats
+    description: Returns usage statistics for a single marketplace extension.
+    operationId: getMarketplaceStats
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Extension name
+    responses:
+      '200':
+        description: Extension usage statistics
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/marketplace.yaml#/MarketplaceStatsResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Extension not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

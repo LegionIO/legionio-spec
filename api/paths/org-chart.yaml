@@ -1,0 +1,68 @@
+/api/org-chart:
+  get:
+    tags:
+      - OrgChart
+    summary: Get organization chart
+    description: >
+      Returns a hierarchical view of extensions, their functions/roles, and
+      the digital workers assigned to each. Requires legion-data to be
+      connected. Returns 503 when the data subsystem is not available.
+    operationId: getOrgChart
+    responses:
+      '200':
+        description: Organization chart
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    departments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: Extension name
+                          roles:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: Function/runner name
+                                workers:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: integer
+                                      name:
+                                        type: string
+                                      status:
+                                        type: string
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Data subsystem not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

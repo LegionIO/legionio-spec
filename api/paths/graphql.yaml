@@ -1,0 +1,107 @@
+/api/graphql:
+  post:
+    tags:
+      - GraphQL
+    summary: Execute GraphQL query
+    description: >
+      Executes a GraphQL query, mutation, or subscription against the Legion
+      GraphQL schema. Requires the graphql gem to be present. Returns
+      GraphQL-spec errors in the errors array on failure.
+    operationId: executeGraphql
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - query
+            properties:
+              query:
+                type: string
+                description: GraphQL query or mutation document
+                example: '{ tasks { id status } }'
+              variables:
+                type: object
+                additionalProperties: true
+                description: Variable values for the query
+              operationName:
+                type: string
+                description: >
+                  Named operation to execute when the document contains
+                  multiple operations
+    responses:
+      '200':
+        description: GraphQL response (errors may still be present in the errors array)
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: [object, 'null']
+                  additionalProperties: true
+                  description: GraphQL response data
+                errors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+      '400':
+        description: query field is missing or empty
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+
+  get:
+    tags:
+      - GraphQL
+    summary: GraphiQL explorer UI
+    description: >
+      Serves the GraphiQL interactive browser-based IDE for exploring the
+      Legion GraphQL schema.
+    operationId: getGraphiql
+    responses:
+      '200':
+        description: GraphiQL HTML page
+        content:
+          text/html:
+            schema:
+              type: string
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

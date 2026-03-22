@@ -1,0 +1,193 @@
+/api/prompts:
+  get:
+    tags:
+      - Prompts
+    summary: List prompts
+    description: >
+      Returns all prompt definitions available from lex-prompt. Requires lex-prompt
+      extension to be loaded; returns 503 otherwise.
+    operationId: listPrompts
+    responses:
+      '200':
+        description: Prompt list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '../schemas/common.yaml#/AnyObject'
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-prompt extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/prompts/{name}:
+  get:
+    tags:
+      - Prompts
+    summary: Get prompt
+    description: Returns a single prompt definition by name.
+    operationId: getPrompt
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          example: summarize
+        description: Prompt name
+    responses:
+      '200':
+        description: Prompt definition
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '../schemas/common.yaml#/AnyObject'
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Prompt not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-prompt extension not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/prompts/{name}/run:
+  post:
+    tags:
+      - Prompts
+    summary: Run prompt
+    description: >
+      Renders a prompt with the provided variables and executes it against the
+      LLM subsystem. Requires both lex-prompt and legion-llm to be available.
+    operationId: runPrompt
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          example: summarize
+        description: Prompt name
+    requestBody:
+      required: false
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              variables:
+                type: object
+                additionalProperties: true
+                description: Key/value pairs to interpolate into the prompt template
+              version:
+                type: string
+                description: Specific prompt version to render (default is latest)
+              model:
+                type: string
+                description: Model override (e.g. claude-3-5-sonnet-20241022)
+              provider:
+                type: string
+                description: Provider override (e.g. claude, openai, bedrock)
+    responses:
+      '200':
+        description: Prompt executed successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    version:
+                      type: [string, 'null']
+                    rendered_prompt:
+                      type: string
+                    response:
+                      type: string
+                    usage:
+                      type: object
+                      properties:
+                        input_tokens:
+                          type: [integer, 'null']
+                        output_tokens:
+                          type: [integer, 'null']
+                    model:
+                      type: string
+                    provider:
+                      type: [string, 'null']
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Prompt not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing or unrenderable prompt variables
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: LLM subsystem or lex-prompt not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

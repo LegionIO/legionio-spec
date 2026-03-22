@@ -1,0 +1,96 @@
+/api/gaia/status:
+  get:
+    tags:
+      - Gaia
+    summary: Get Gaia status
+    description: >
+      Returns the current status of the Gaia cognitive coordination layer.
+      Returns 503 with started: false when Gaia is not running.
+    operationId: getGaiaStatus
+    responses:
+      '200':
+        description: Gaia status
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  description: Gaia status object (shape varies by Gaia version)
+                  additionalProperties: true
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Gaia not started
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    started:
+                      type: boolean
+                      example: false
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+
+/api/channels/teams/webhook:
+  post:
+    tags:
+      - Gaia
+    summary: Receive Microsoft Teams webhook
+    description: >
+      Accepts an inbound Teams Bot Framework activity payload and routes it
+      through the Gaia sensory buffer. Requires the Teams channel adapter to
+      be registered in the Gaia channel registry. Returns 503 when the
+      adapter is not available.
+    operationId: teamsWebhook
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Teams Bot Framework Activity object
+            additionalProperties: true
+    responses:
+      '200':
+        description: Activity accepted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: accepted
+                    frame_id:
+                      type: [string, 'null']
+                      description: GAIA InputFrame identifier
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Teams adapter not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

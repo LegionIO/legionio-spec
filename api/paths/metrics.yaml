@@ -1,0 +1,30 @@
+/metrics:
+  get:
+    tags:
+      - Metrics
+    summary: Prometheus metrics
+    description: >
+      Exposes Prometheus metrics in the text exposition format (version 0.0.4).
+      Gauges are refreshed on each request. Returns 404 plain text when the
+      prometheus-client gem is not available. Note: this endpoint has no /api/
+      prefix and is unauthenticated to allow scraping by Prometheus.
+    operationId: getMetrics
+    security: []
+    responses:
+      '200':
+        description: Prometheus text exposition
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: |
+                # HELP legion_tasks_total Total tasks processed
+                # TYPE legion_tasks_total counter
+                legion_tasks_total 42
+      '404':
+        description: prometheus-client gem not available
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: 'prometheus-client gem not available'

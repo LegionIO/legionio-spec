@@ -1,0 +1,133 @@
+MarketplaceEntryObject:
+  type: object
+  properties:
+    name:
+      type: string
+      description: Extension gem name
+      example: lex-node
+    version:
+      type: string
+      description: Installed version
+      example: 0.3.2
+    status:
+      type: string
+      enum: [pending_review, approved, rejected, deprecated]
+      description: Marketplace approval status
+    risk_tier:
+      type: [string, 'null']
+      enum: [low, medium, high, critical, null]
+      description: AIRB risk tier classification
+    description:
+      type: [string, 'null']
+    successor:
+      type: [string, 'null']
+      description: Replacement extension name (set when deprecated)
+    sunset_date:
+      type: [string, 'null']
+      format: date
+      description: Date after which the deprecated extension will be removed
+    created_at:
+      type: [string, 'null']
+      format: date-time
+    updated_at:
+      type: [string, 'null']
+      format: date-time
+
+MarketplaceEntryResponse:
+  type: object
+  properties:
+    data:
+      allOf:
+        - $ref: './marketplace.yaml#/MarketplaceEntryObject'
+        - type: object
+          properties:
+            stats:
+              $ref: './marketplace.yaml#/MarketplaceStatsObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+MarketplaceCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './marketplace.yaml#/MarketplaceEntryObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+MarketplaceStatsObject:
+  type: object
+  properties:
+    invocations:
+      type: integer
+      description: Total invocation count
+    last_invoked_at:
+      type: [string, 'null']
+      format: date-time
+    error_count:
+      type: [integer, 'null']
+  additionalProperties: true
+
+MarketplaceStatsResponse:
+  type: object
+  properties:
+    data:
+      $ref: './marketplace.yaml#/MarketplaceStatsObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+MarketplaceStatusResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+        entry:
+          $ref: './marketplace.yaml#/MarketplaceEntryObject'
+      required:
+        - name
+        - status
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+MarketplaceApproveInput:
+  type: object
+  properties:
+    notes:
+      type: string
+      description: Reviewer notes
+
+MarketplaceRejectInput:
+  type: object
+  properties:
+    reason:
+      type: string
+      description: Rejection reason
+
+MarketplaceDeprecateInput:
+  type: object
+  properties:
+    successor:
+      type: [string, 'null']
+      description: Name of the replacement extension
+    sunset_date:
+      type: [string, 'null']
+      format: date
+      description: Date after which the extension will be removed (ISO 8601)

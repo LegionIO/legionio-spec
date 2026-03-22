@@ -50,6 +50,11 @@ ErrorResponse:
     - error
     - meta
 
+AnyObject:
+  type: object
+  additionalProperties: true
+  description: Arbitrary JSON object
+
 DeletedResponse:
   type: object
   properties:

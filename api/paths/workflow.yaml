@@ -1,0 +1,79 @@
+/api/relationships/graph:
+  get:
+    tags:
+      - Workflow
+    summary: Get relationship graph
+    description: >
+      Returns a node/edge graph of task relationships. Optionally filtered by
+      chain_id or extension name. Requires legion-data to be connected. Nodes
+      represent tasks or runners; edges represent relationships between them.
+    operationId: getRelationshipGraph
+    parameters:
+      - name: chain_id
+        in: query
+        required: false
+        schema:
+          type: integer
+        description: Filter graph to a specific chain
+      - name: extension
+        in: query
+        required: false
+        schema:
+          type: string
+          example: lex-node
+        description: Filter graph to nodes belonging to a specific extension
+    responses:
+      '200':
+        description: Relationship graph
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    nodes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          label:
+                            type: string
+                          type:
+                            type: string
+                          extension:
+                            type: string
+                    edges:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          source:
+                            type: string
+                          target:
+                            type: string
+                          label:
+                            type: [string, 'null']
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: Data subsystem not available
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

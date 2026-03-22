@@ -1,0 +1,120 @@
+AgentCard:
+  type: object
+  description: ACP agent.json discovery card (A2A protocol)
+  properties:
+    name:
+      type: string
+      description: Agent/node name
+      example: legion
+    description:
+      type: string
+      example: LegionIO digital worker
+    url:
+      type: string
+      format: uri
+      description: Base URL for ACP task submissions
+      example: http://localhost:4567/api/acp
+    version:
+      type: string
+      example: '2.0'
+    protocol:
+      type: string
+      example: acp/1.0
+    capabilities:
+      type: array
+      items:
+        type: string
+      description: List of capability identifiers discovered from loaded extensions
+    authentication:
+      type: object
+      properties:
+        schemes:
+          type: array
+          items:
+            type: string
+          example: [bearer]
+    defaultInputModes:
+      type: array
+      items:
+        type: string
+      example: ['text/plain', 'application/json']
+    defaultOutputModes:
+      type: array
+      items:
+        type: string
+      example: ['text/plain', 'application/json']
+  required:
+    - name
+    - url
+    - version
+    - protocol
+
+AcpTaskInput:
+  type: object
+  description: ACP task submission payload
+  properties:
+    runner_class:
+      type: string
+      description: Fully-qualified runner class name
+      example: Legion::Extensions::Node::Runners::Status
+    function:
+      type: string
+      description: Runner function to invoke
+      example: status
+    input:
+      type: object
+      additionalProperties: true
+      description: Payload forwarded to the runner as kwargs
+  required:
+    - runner_class
+    - function
+
+AcpTaskQueuedResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        task_id:
+          type: integer
+          description: Internal Legion task ID
+        status:
+          type: string
+          example: queued
+      required:
+        - task_id
+        - status
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+AcpTaskStatusResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        task_id:
+          type: integer
+        status:
+          type: string
+          enum: [queued, in_progress, completed, failed]
+          description: ACP-normalized task state
+        output:
+          type: object
+          description: Task result data
+          additionalProperties: true
+        created_at:
+          type: [string, 'null']
+        completed_at:
+          type: [string, 'null']
+      required:
+        - task_id
+        - status
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta

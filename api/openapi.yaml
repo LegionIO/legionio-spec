@@ -83,6 +83,10 @@ tags:
     description: Agent Communication Protocol
   - name: Metrics
     description: Prometheus metrics
+  - name: OrgChart
+    description: Digital worker organization chart
+  - name: Workflow
+    description: Task relationship graph
 
 paths:
   /api/health:
@@ -269,6 +273,55 @@ paths:
     $ref: './paths/webhooks.yaml#/~1api~1webhooks'
   /api/webhooks/{id}:
     $ref: './paths/webhooks.yaml#/~1api~1webhooks~1{id}'
+
+  /api/marketplace:
+    $ref: './paths/marketplace.yaml#/~1api~1marketplace'
+  /api/marketplace/{name}:
+    $ref: './paths/marketplace.yaml#/~1api~1marketplace~1{name}'
+  /api/marketplace/{name}/submit:
+    $ref: './paths/marketplace.yaml#/~1api~1marketplace~1{name}~1submit'
+  /api/marketplace/{name}/approve:
+    $ref: './paths/marketplace.yaml#/~1api~1marketplace~1{name}~1approve'
+  /api/marketplace/{name}/reject:
+    $ref: './paths/marketplace.yaml#/~1api~1marketplace~1{name}~1reject'
+  /api/marketplace/{name}/deprecate:
+    $ref: './paths/marketplace.yaml#/~1api~1marketplace~1{name}~1deprecate'
+  /api/marketplace/{name}/stats:
+    $ref: './paths/marketplace.yaml#/~1api~1marketplace~1{name}~1stats'
+
+  /api/prompts:
+    $ref: './paths/prompts.yaml#/~1api~1prompts'
+  /api/prompts/{name}:
+    $ref: './paths/prompts.yaml#/~1api~1prompts~1{name}'
+  /api/prompts/{name}/run:
+    $ref: './paths/prompts.yaml#/~1api~1prompts~1{name}~1run'
+
+  /api/coldstart/ingest:
+    $ref: './paths/coldstart.yaml#/~1api~1coldstart~1ingest'
+
+  /api/gaia/status:
+    $ref: './paths/gaia.yaml#/~1api~1gaia~1status'
+  /api/channels/teams/webhook:
+    $ref: './paths/gaia.yaml#/~1api~1channels~1teams~1webhook'
+
+  /api/graphql:
+    $ref: './paths/graphql.yaml#/~1api~1graphql'
+
+  /.well-known/agent.json:
+    $ref: './paths/acp.yaml#/~1.well-known~1agent.json'
+  /api/acp/tasks:
+    $ref: './paths/acp.yaml#/~1api~1acp~1tasks'
+  /api/acp/tasks/{id}:
+    $ref: './paths/acp.yaml#/~1api~1acp~1tasks~1{id}'
+
+  /metrics:
+    $ref: './paths/metrics.yaml#/~1metrics'
+
+  /api/org-chart:
+    $ref: './paths/org-chart.yaml#/~1api~1org-chart'
+
+  /api/relationships/graph:
+    $ref: './paths/workflow.yaml#/~1api~1relationships~1graph'
 
 components:
   securitySchemes:
@@ -574,3 +627,37 @@ components:
       $ref: './schemas/webhook.yaml#/WebhookResponse'
     WebhookCollectionResponse:
       $ref: './schemas/webhook.yaml#/WebhookCollectionResponse'
+
+    # Common helpers
+    AnyObject:
+      $ref: './schemas/common.yaml#/AnyObject'
+
+    # Marketplace schemas
+    MarketplaceEntryObject:
+      $ref: './schemas/marketplace.yaml#/MarketplaceEntryObject'
+    MarketplaceEntryResponse:
+      $ref: './schemas/marketplace.yaml#/MarketplaceEntryResponse'
+    MarketplaceCollectionResponse:
+      $ref: './schemas/marketplace.yaml#/MarketplaceCollectionResponse'
+    MarketplaceStatsObject:
+      $ref: './schemas/marketplace.yaml#/MarketplaceStatsObject'
+    MarketplaceStatsResponse:
+      $ref: './schemas/marketplace.yaml#/MarketplaceStatsResponse'
+    MarketplaceStatusResponse:
+      $ref: './schemas/marketplace.yaml#/MarketplaceStatusResponse'
+    MarketplaceApproveInput:
+      $ref: './schemas/marketplace.yaml#/MarketplaceApproveInput'
+    MarketplaceRejectInput:
+      $ref: './schemas/marketplace.yaml#/MarketplaceRejectInput'
+    MarketplaceDeprecateInput:
+      $ref: './schemas/marketplace.yaml#/MarketplaceDeprecateInput'
+
+    # ACP schemas
+    AgentCard:
+      $ref: './schemas/acp.yaml#/AgentCard'
+    AcpTaskInput:
+      $ref: './schemas/acp.yaml#/AcpTaskInput'
+    AcpTaskQueuedResponse:
+      $ref: './schemas/acp.yaml#/AcpTaskQueuedResponse'
+    AcpTaskStatusResponse:
+      $ref: './schemas/acp.yaml#/AcpTaskStatusResponse'

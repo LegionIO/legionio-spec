@@ -1,0 +1,74 @@
+/api/coldstart/ingest:
+  post:
+    tags:
+      - Coldstart
+    summary: Ingest file or directory into memory
+    description: >
+      Triggers lex-coldstart to ingest a file or directory of context files
+      (CLAUDE.md, MEMORY.md) into lex-memory. Requires both lex-coldstart and
+      lex-memory extensions to be loaded. Accepts a single file path or a
+      directory path with an optional glob pattern.
+    operationId: coldstartIngest
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - path
+            properties:
+              path:
+                type: string
+                description: Absolute path to a file or directory to ingest
+                example: /home/user/projects/myapp
+              pattern:
+                type: string
+                description: >
+                  Glob pattern for directory ingestion. Defaults to
+                  **/{CLAUDE,MEMORY}.md
+                example: '**/{CLAUDE,MEMORY}.md'
+    responses:
+      '201':
+        description: Ingest completed
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  description: Ingest result summary (traces created, files processed)
+                  additionalProperties: true
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Path not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '422':
+        description: Missing required field (path)
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '503':
+        description: lex-coldstart or lex-memory not loaded
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

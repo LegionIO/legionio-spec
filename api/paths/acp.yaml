@@ -1,0 +1,130 @@
+/.well-known/agent.json:
+  get:
+    tags:
+      - ACP
+    summary: Agent card (A2A discovery)
+    description: >
+      Returns the ACP agent.json discovery card describing this Legion node's
+      identity, capabilities, supported input/output modes, and authentication
+      requirements. Used by A2A-compatible orchestrators for agent discovery.
+    operationId: getAgentCard
+    security: []
+    responses:
+      '200':
+        description: ACP agent card
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/acp.yaml#/AgentCard'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/acp/tasks:
+  post:
+    tags:
+      - ACP
+    summary: Submit ACP task
+    description: >
+      Submits a task via the Agent Communication Protocol. The input payload is
+      dispatched through Legion::Ingress with source=acp. Returns the task_id
+      and initial queued status immediately (async).
+    operationId: submitAcpTask
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/acp.yaml#/AcpTaskInput'
+    responses:
+      '202':
+        description: Task queued
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/acp.yaml#/AcpTaskQueuedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/acp/tasks/{id}:
+  get:
+    tags:
+      - ACP
+    summary: Get ACP task status
+    description: >
+      Returns the current status and output of an ACP task. Translates
+      internal Legion task states to the ACP state vocabulary:
+      queued, in_progress, completed, failed.
+    operationId: getAcpTask
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Task ID
+    responses:
+      '200':
+        description: ACP task status
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/acp.yaml#/AcpTaskStatusResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Task not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  delete:
+    tags:
+      - ACP
+    summary: Cancel ACP task
+    description: Task cancellation is not yet implemented. Returns 501.
+    operationId: cancelAcpTask
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Task ID
+    responses:
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

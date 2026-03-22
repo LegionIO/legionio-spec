@@ -1,0 +1,92 @@
+/api/teams/{team}/workers:
+  get:
+    tags:
+      - Teams
+    summary: List team workers
+    description: Returns all digital workers belonging to the specified team, ordered by id.
+    operationId: listTeamWorkers
+    parameters:
+      - name: team
+        in: path
+        required: true
+        schema:
+          type: string
+          example: platform
+        description: Team name
+    responses:
+      '200':
+        description: Team worker list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/worker.yaml#/WorkerCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/teams/{team}/costs:
+  get:
+    tags:
+      - Teams
+    summary: Get team costs
+    description: >
+      Returns aggregated cost metering data for all workers in a team.
+      Requires lex-metering to be installed; without it, total_cost will be null.
+    operationId: getTeamCosts
+    parameters:
+      - name: team
+        in: path
+        required: true
+        schema:
+          type: string
+          example: platform
+        description: Team name
+    responses:
+      '200':
+        description: Team cost data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    team:
+                      type: string
+                      example: platform
+                    total_cost:
+                      type: ['number', 'null']
+                      example: null
+                    currency:
+                      type: string
+                      example: USD
+                    metering_period:
+                      type: ['string', 'null']
+                      example: null
+                    note:
+                      type: string
+                      example: cost metering requires lex-metering
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

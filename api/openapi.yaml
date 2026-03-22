@@ -153,6 +153,36 @@ paths:
   /api/transport/publish:
     $ref: './paths/transport.yaml#/~1api~1transport~1publish'
 
+  /api/workers:
+    $ref: './paths/workers.yaml#/~1api~1workers'
+  /api/workers/approvals:
+    $ref: './paths/workers.yaml#/~1api~1workers~1approvals'
+  /api/workers/{id}:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}'
+  /api/workers/{id}/lifecycle:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1lifecycle'
+  /api/workers/{id}/health:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1health'
+  /api/workers/{id}/tasks:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1tasks'
+  /api/workers/{id}/events:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1events'
+  /api/workers/{id}/costs:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1costs'
+  /api/workers/{id}/value:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1value'
+  /api/workers/{id}/roi:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1roi'
+  /api/workers/{id}/approve:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1approve'
+  /api/workers/{id}/reject:
+    $ref: './paths/workers.yaml#/~1api~1workers~1{id}~1reject'
+
+  /api/teams/{team}/workers:
+    $ref: './paths/teams.yaml#/~1api~1teams~1{team}~1workers'
+  /api/teams/{team}/costs:
+    $ref: './paths/teams.yaml#/~1api~1teams~1{team}~1costs'
+
 components:
   securitySchemes:
     BearerAuth:

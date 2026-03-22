@@ -2799,6 +2799,1125 @@
           }
         }
       }
+    },
+    "/api/workers": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "List workers",
+        "description": "Returns a list of digital workers ordered by id. Optionally filtered by team, owner_msid, lifecycle_state, risk_tier, or health_status.\n",
+        "operationId": "listWorkers",
+        "parameters": [
+          {
+            "name": "team",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "platform"
+            },
+            "description": "Filter by team name"
+          },
+          {
+            "name": "owner_msid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "jane.doe@example.com"
+            },
+            "description": "Filter by owner MSID"
+          },
+          {
+            "name": "lifecycle_state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "active"
+            },
+            "description": "Filter by lifecycle state"
+          },
+          {
+            "name": "risk_tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "tier-2"
+            },
+            "description": "Filter by risk tier"
+          },
+          {
+            "name": "health_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "healthy"
+            },
+            "description": "Filter by health status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Create a worker",
+        "description": "Registers a new digital worker. Requires name, extension_name, entra_app_id, and owner_msid. Returns 422 if any required field is missing.\n",
+        "operationId": "createWorker",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Worker created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing required field",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/approvals": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "List pending approvals",
+        "description": "Returns all workers currently pending approval.",
+        "operationId": "listWorkerApprovals",
+        "responses": {
+          "200": {
+            "description": "Pending approvals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Get worker",
+        "description": "Returns a single digital worker by worker_id.",
+        "operationId": "getWorker",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Delete (retire) worker",
+        "description": "Retires the worker by transitioning its lifecycle state to 'retired'. Returns 422 if the transition is not valid from the current state.\n",
+        "operationId": "deleteWorker",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "decommissioned"
+            },
+            "description": "Reason for retirement"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker retired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid lifecycle transition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/lifecycle": {
+      "patch": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Update worker lifecycle",
+        "description": "Transitions the worker to a new lifecycle state. Requires 'state' in the request body. Returns 403 if governance or authority requirements are not met. Returns 422 if the transition is not valid.\n",
+        "operationId": "updateWorkerLifecycle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerLifecycleInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Worker lifecycle updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Governance or authority required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid lifecycle transition or missing field",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/health": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Get worker health",
+        "description": "Returns the health snapshot for a worker including heartbeat time and node metrics.",
+        "operationId": "getWorkerHealth",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker health snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerHealthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/tasks": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Get worker tasks",
+        "description": "Returns tasks associated with a worker, ordered by id descending.",
+        "operationId": "getWorkerTasks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker task list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/events": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Get worker events",
+        "description": "Returns lifecycle events for a worker. Note: lifecycle event persistence is not yet implemented; this endpoint currently returns an empty events array.\n",
+        "operationId": "getWorkerEvents",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "worker_id": {
+                          "type": "string",
+                          "example": "worker-abc123"
+                        },
+                        "events": {
+                          "type": "array",
+                          "items": {}
+                        },
+                        "note": {
+                          "type": "string",
+                          "example": "lifecycle event persistence is not yet implemented"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/costs": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Get worker costs",
+        "description": "Returns cost metering data for a worker. Requires lex-metering to be installed; without it, total_cost will be null.\n",
+        "operationId": "getWorkerCosts",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker cost data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "worker_id": {
+                          "type": "string",
+                          "example": "worker-abc123"
+                        },
+                        "total_cost": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "example": null
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "USD"
+                        },
+                        "metering_period": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": null
+                        },
+                        "note": {
+                          "type": "string",
+                          "example": "cost metering requires lex-metering"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/value": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Get worker value",
+        "description": "Returns value metrics summary and recent entries for a worker. Optionally filtered by 'since' timestamp (ISO 8601). Defaults to last 7 days.\n",
+        "operationId": "getWorkerValue",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-01T00:00:00Z"
+            },
+            "description": "Return value entries since this timestamp (ISO 8601)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker value metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "worker_id": {
+                          "type": "string",
+                          "example": "worker-abc123"
+                        },
+                        "summary": {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        "recent": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/roi": {
+      "get": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Get worker ROI",
+        "description": "Returns combined value and cost data for ROI calculation. Cost data requires lex-metering; without it, token/call counts will be zero.\n",
+        "operationId": "getWorkerRoi",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "monthly",
+              "default": "monthly"
+            },
+            "description": "Cost metering period (monthly, weekly, daily)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker ROI data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "worker_id": {
+                          "type": "string",
+                          "example": "worker-abc123"
+                        },
+                        "value": {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        "cost": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Worker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/approve": {
+      "post": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Approve worker",
+        "description": "Approves a worker pending registration. Transitions the worker to the approved/active lifecycle state. Returns 422 if the worker is not in a pending state.\n",
+        "operationId": "approveWorker",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerApproveInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Worker approved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request or lifecycle transition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workers/{id}/reject": {
+      "post": {
+        "tags": [
+          "Workers"
+        ],
+        "summary": "Reject worker",
+        "description": "Rejects a worker pending registration. Requires 'reason' in the request body. Returns 422 if the worker is not in a pending state or reason is missing.\n",
+        "operationId": "rejectWorker",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "worker-abc123"
+            },
+            "description": "Worker ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerRejectInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Worker rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request, missing reason, or invalid lifecycle transition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teams/{team}/workers": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "List team workers",
+        "description": "Returns all digital workers belonging to the specified team, ordered by id.",
+        "operationId": "listTeamWorkers",
+        "parameters": [
+          {
+            "name": "team",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "platform"
+            },
+            "description": "Team name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team worker list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teams/{team}/costs": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get team costs",
+        "description": "Returns aggregated cost metering data for all workers in a team. Requires lex-metering to be installed; without it, total_cost will be null.\n",
+        "operationId": "getTeamCosts",
+        "parameters": [
+          {
+            "name": "team",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "platform"
+            },
+            "description": "Team name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team cost data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "team": {
+                          "type": "string",
+                          "example": "platform"
+                        },
+                        "total_cost": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "example": null
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "USD"
+                        },
+                        "metering_period": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": null
+                        },
+                        "note": {
+                          "type": "string",
+                          "example": "cost metering requires lex-metering"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

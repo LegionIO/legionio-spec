@@ -1,0 +1,147 @@
+ExtensionObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    name:
+      type: string
+      example: lex-http
+    namespace:
+      type: string
+      example: Legion::Extensions::Http
+    active:
+      type: boolean
+      example: true
+    version:
+      type: ['string', 'null']
+      example: 0.2.5
+  required:
+    - id
+    - name
+    - namespace
+    - active
+
+RunnerObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 10
+    extension_id:
+      type: integer
+      example: 1
+    name:
+      type: string
+      example: Http
+    namespace:
+      type: string
+      example: Legion::Extensions::Http::Runners::Http
+  required:
+    - id
+    - extension_id
+    - name
+    - namespace
+
+FunctionObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 100
+    runner_id:
+      type: integer
+      example: 10
+    name:
+      type: string
+      example: get
+  required:
+    - id
+    - runner_id
+    - name
+
+FunctionInvokeInput:
+  type: object
+  description: >
+    Payload forwarded to the runner function. All extra keys are passed through
+    as the task payload. check_subtask and generate_task control Ingress behavior.
+  properties:
+    check_subtask:
+      type: boolean
+      default: true
+    generate_task:
+      type: boolean
+      default: true
+  additionalProperties: true
+
+ExtensionResponse:
+  type: object
+  properties:
+    data:
+      $ref: '#/ExtensionObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+ExtensionCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/ExtensionObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+RunnerResponse:
+  type: object
+  properties:
+    data:
+      $ref: '#/RunnerObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+RunnerCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/RunnerObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+FunctionResponse:
+  type: object
+  properties:
+    data:
+      $ref: '#/FunctionObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+FunctionCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/FunctionObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta

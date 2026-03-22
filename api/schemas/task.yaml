@@ -1,0 +1,178 @@
+TaskObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 42
+    function_id:
+      type: integer
+      example: 7
+    status:
+      type: string
+      example: complete
+    payload:
+      type: object
+      additionalProperties: true
+    worker_id:
+      type: ['string', 'null']
+      example: worker-abc123
+    created_at:
+      type: string
+      format: date-time
+    updated_at:
+      type: string
+      format: date-time
+    metering:
+      $ref: '#/TaskMetering'
+  required:
+    - id
+    - function_id
+    - status
+    - created_at
+    - updated_at
+
+TaskMetering:
+  type: object
+  description: Aggregated LLM token usage for this task. Present only when metering records exist.
+  properties:
+    total_tokens:
+      type: integer
+      example: 1200
+    input_tokens:
+      type: integer
+      example: 800
+    output_tokens:
+      type: integer
+      example: 400
+    thinking_tokens:
+      type: integer
+      example: 0
+    total_calls:
+      type: integer
+      example: 3
+    avg_latency_ms:
+      type: number
+      format: float
+      example: 342.5
+    provider:
+      type: array
+      items:
+        type: string
+      example: ['bedrock']
+    model:
+      type: array
+      items:
+        type: string
+      example: ['claude-3-5-sonnet-20241022']
+  required:
+    - total_tokens
+    - input_tokens
+    - output_tokens
+    - thinking_tokens
+    - total_calls
+    - avg_latency_ms
+    - provider
+    - model
+
+TaskInput:
+  type: object
+  required:
+    - runner_class
+    - function
+  properties:
+    runner_class:
+      type: string
+      description: Fully qualified runner class name
+      example: Legion::Extensions::Http::Runners::Http
+    function:
+      type: string
+      description: Runner function name to invoke
+      example: get
+    check_subtask:
+      type: boolean
+      default: true
+      description: Whether to check for an existing subtask before creating a new one
+    generate_task:
+      type: boolean
+      default: true
+      description: Whether to persist a task record for this invocation
+  additionalProperties: true
+
+TaskResponse:
+  type: object
+  properties:
+    data:
+      $ref: '#/TaskObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+TaskCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/TaskObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+TaskLogObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    task_id:
+      type: integer
+      example: 42
+    level:
+      type: string
+      example: info
+    message:
+      type: string
+      example: Task started
+    created_at:
+      type: string
+      format: date-time
+  required:
+    - id
+    - task_id
+    - level
+    - message
+    - created_at
+
+TaskLogCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/TaskLogObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+TaskCreatedResponse:
+  type: object
+  description: Response from POST /api/tasks — task_id and status from Ingress
+  properties:
+    data:
+      type: object
+      additionalProperties: true
+      properties:
+        task_id:
+          type: integer
+          example: 42
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta

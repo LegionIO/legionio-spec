@@ -1,0 +1,156 @@
+ScheduleObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 5
+    function_id:
+      type: integer
+      example: 7
+    cron:
+      type: ['string', 'null']
+      example: '0 * * * *'
+    interval:
+      type: ['integer', 'null']
+      description: Interval in seconds between runs
+      example: 300
+    active:
+      type: boolean
+      example: true
+    last_run:
+      type: ['string', 'null']
+      format: date-time
+    task_ttl:
+      type: ['integer', 'null']
+      description: Time-to-live for generated tasks, in seconds
+      example: 3600
+    payload:
+      type: string
+      description: JSON-encoded payload forwarded to the runner on each execution
+      example: '{"key":"value"}'
+    transformation:
+      type: ['string', 'null']
+      description: Optional lex-transformer definition name to apply before execution
+      example: normalize_invoice
+  required:
+    - id
+    - function_id
+    - active
+
+ScheduleInput:
+  type: object
+  required:
+    - function_id
+  properties:
+    function_id:
+      type: integer
+      description: ID of the function to invoke on each tick
+      example: 7
+    cron:
+      type: string
+      description: Cron expression. Required when interval is not provided.
+      example: '0 * * * *'
+    interval:
+      type: integer
+      description: Interval in seconds. Required when cron is not provided.
+      example: 300
+    active:
+      type: boolean
+      default: true
+    task_ttl:
+      type: ['integer', 'null']
+      description: Time-to-live for generated tasks, in seconds
+      example: 3600
+    payload:
+      type: object
+      description: >
+        Payload forwarded to the runner on each execution.
+        Serialized to JSON when stored.
+      additionalProperties: true
+    transformation:
+      type: ['string', 'null']
+      description: lex-transformer definition name to apply before execution
+      example: normalize_invoice
+
+ScheduleUpdateInput:
+  type: object
+  description: >
+    All fields are optional. Only provided fields are updated.
+    Must include at least one of cron or interval if changing the trigger.
+  properties:
+    cron:
+      type: string
+      example: '*/5 * * * *'
+    interval:
+      type: integer
+      example: 600
+    active:
+      type: boolean
+    task_ttl:
+      type: ['integer', 'null']
+    payload:
+      type: object
+      additionalProperties: true
+    transformation:
+      type: ['string', 'null']
+
+ScheduleResponse:
+  type: object
+  properties:
+    data:
+      $ref: '#/ScheduleObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+ScheduleCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/ScheduleObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta
+
+ScheduleLogObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    schedule_id:
+      type: integer
+      example: 5
+    task_id:
+      type: ['integer', 'null']
+      example: 42
+    status:
+      type: string
+      example: success
+    ran_at:
+      type: string
+      format: date-time
+  required:
+    - id
+    - schedule_id
+    - status
+    - ran_at
+
+ScheduleLogCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/ScheduleLogObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta

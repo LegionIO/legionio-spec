@@ -1,0 +1,48 @@
+NodeObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    name:
+      type: string
+      example: node-01
+    status:
+      type: string
+      example: online
+    active:
+      type: boolean
+      example: true
+    created_at:
+      type: string
+      format: date-time
+  required:
+    - id
+    - name
+    - status
+    - active
+    - created_at
+
+NodeResponse:
+  type: object
+  properties:
+    data:
+      $ref: '#/NodeObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+NodeCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/NodeObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta

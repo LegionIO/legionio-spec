@@ -1,0 +1,190 @@
+WorkerObject:
+  type: object
+  properties:
+    worker_id:
+      type: string
+      example: worker-abc123
+    name:
+      type: string
+      example: my-invoice-processor
+    extension_name:
+      type: string
+      example: lex-invoice
+    entra_app_id:
+      type: string
+      example: 00000000-0000-0000-0000-000000000001
+    owner_msid:
+      type: string
+      example: jane.doe@example.com
+    owner_name:
+      type: ['string', 'null']
+      example: Jane Doe
+    business_role:
+      type: ['string', 'null']
+      example: Senior Engineer
+    risk_tier:
+      type: ['string', 'null']
+      example: tier-2
+    team:
+      type: ['string', 'null']
+      example: platform
+    lifecycle_state:
+      type: string
+      example: active
+    manager_msid:
+      type: ['string', 'null']
+      example: manager@example.com
+    health_status:
+      type: ['string', 'null']
+      example: healthy
+    last_heartbeat_at:
+      type: ['string', 'null']
+      format: date-time
+    health_node:
+      type: ['string', 'null']
+      example: node-01
+  required:
+    - worker_id
+    - name
+    - extension_name
+    - entra_app_id
+    - owner_msid
+    - lifecycle_state
+
+WorkerInput:
+  type: object
+  required:
+    - name
+    - extension_name
+    - entra_app_id
+    - owner_msid
+  properties:
+    name:
+      type: string
+      example: my-invoice-processor
+    extension_name:
+      type: string
+      example: lex-invoice
+    entra_app_id:
+      type: string
+      example: 00000000-0000-0000-0000-000000000001
+    owner_msid:
+      type: string
+      example: jane.doe@example.com
+    owner_name:
+      type: string
+      example: Jane Doe
+    business_role:
+      type: string
+      example: Senior Engineer
+    risk_tier:
+      type: string
+      example: tier-2
+    team:
+      type: string
+      example: platform
+    manager_msid:
+      type: string
+      example: manager@example.com
+
+WorkerLifecycleInput:
+  type: object
+  required:
+    - state
+  properties:
+    state:
+      type: string
+      description: Target lifecycle state
+      example: paused
+    by:
+      type: string
+      description: Identity performing the transition (MSID or service name)
+      example: jane.doe@example.com
+    reason:
+      type: string
+      description: Human-readable reason for the transition
+      example: Scheduled maintenance window
+    governance_override:
+      type: boolean
+      default: false
+      description: Override governance gate (requires elevated authority)
+    authority_verified:
+      type: boolean
+      default: false
+      description: Confirm that the caller has verified authority for this transition
+
+WorkerApproveInput:
+  type: object
+  properties:
+    approver:
+      type: string
+      example: jane.doe@example.com
+    notes:
+      type: string
+      example: Verified with team lead
+
+WorkerRejectInput:
+  type: object
+  required:
+    - reason
+  properties:
+    approver:
+      type: string
+      example: jane.doe@example.com
+    reason:
+      type: string
+      example: Missing risk assessment documentation
+
+WorkerHealthResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        worker_id:
+          type: string
+          example: worker-abc123
+        health_status:
+          type: string
+          example: healthy
+        last_heartbeat_at:
+          type: ['string', 'null']
+          format: date-time
+        health_node:
+          type: ['string', 'null']
+          example: node-01
+        node_metrics:
+          type: ['object', 'null']
+          additionalProperties: true
+      required:
+        - worker_id
+        - health_status
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+WorkerResponse:
+  type: object
+  properties:
+    data:
+      $ref: '#/WorkerObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+WorkerCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/WorkerObject'
+    meta:
+      $ref: './common.yaml#/MetaCollection'
+  required:
+    - data
+    - meta

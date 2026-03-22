@@ -112,3 +112,85 @@ components:
       $ref: './schemas/common.yaml#/ErrorResponse'
     DeletedResponse:
       $ref: './schemas/common.yaml#/DeletedResponse'
+
+    # Task schemas
+    TaskObject:
+      $ref: './schemas/task.yaml#/TaskObject'
+    TaskMetering:
+      $ref: './schemas/task.yaml#/TaskMetering'
+    TaskInput:
+      $ref: './schemas/task.yaml#/TaskInput'
+    TaskResponse:
+      $ref: './schemas/task.yaml#/TaskResponse'
+    TaskCollectionResponse:
+      $ref: './schemas/task.yaml#/TaskCollectionResponse'
+    TaskLogObject:
+      $ref: './schemas/task.yaml#/TaskLogObject'
+    TaskLogCollectionResponse:
+      $ref: './schemas/task.yaml#/TaskLogCollectionResponse'
+    TaskCreatedResponse:
+      $ref: './schemas/task.yaml#/TaskCreatedResponse'
+
+    # Worker schemas
+    WorkerObject:
+      $ref: './schemas/worker.yaml#/WorkerObject'
+    WorkerInput:
+      $ref: './schemas/worker.yaml#/WorkerInput'
+    WorkerLifecycleInput:
+      $ref: './schemas/worker.yaml#/WorkerLifecycleInput'
+    WorkerApproveInput:
+      $ref: './schemas/worker.yaml#/WorkerApproveInput'
+    WorkerRejectInput:
+      $ref: './schemas/worker.yaml#/WorkerRejectInput'
+    WorkerHealthResponse:
+      $ref: './schemas/worker.yaml#/WorkerHealthResponse'
+    WorkerResponse:
+      $ref: './schemas/worker.yaml#/WorkerResponse'
+    WorkerCollectionResponse:
+      $ref: './schemas/worker.yaml#/WorkerCollectionResponse'
+
+    # Extension schemas
+    ExtensionObject:
+      $ref: './schemas/extension.yaml#/ExtensionObject'
+    RunnerObject:
+      $ref: './schemas/extension.yaml#/RunnerObject'
+    FunctionObject:
+      $ref: './schemas/extension.yaml#/FunctionObject'
+    FunctionInvokeInput:
+      $ref: './schemas/extension.yaml#/FunctionInvokeInput'
+    ExtensionResponse:
+      $ref: './schemas/extension.yaml#/ExtensionResponse'
+    ExtensionCollectionResponse:
+      $ref: './schemas/extension.yaml#/ExtensionCollectionResponse'
+    RunnerResponse:
+      $ref: './schemas/extension.yaml#/RunnerResponse'
+    RunnerCollectionResponse:
+      $ref: './schemas/extension.yaml#/RunnerCollectionResponse'
+    FunctionResponse:
+      $ref: './schemas/extension.yaml#/FunctionResponse'
+    FunctionCollectionResponse:
+      $ref: './schemas/extension.yaml#/FunctionCollectionResponse'
+
+    # Node schemas
+    NodeObject:
+      $ref: './schemas/node.yaml#/NodeObject'
+    NodeResponse:
+      $ref: './schemas/node.yaml#/NodeResponse'
+    NodeCollectionResponse:
+      $ref: './schemas/node.yaml#/NodeCollectionResponse'
+
+    # Schedule schemas
+    ScheduleObject:
+      $ref: './schemas/schedule.yaml#/ScheduleObject'
+    ScheduleInput:
+      $ref: './schemas/schedule.yaml#/ScheduleInput'
+    ScheduleUpdateInput:
+      $ref: './schemas/schedule.yaml#/ScheduleUpdateInput'
+    ScheduleResponse:
+      $ref: './schemas/schedule.yaml#/ScheduleResponse'
+    ScheduleCollectionResponse:
+      $ref: './schemas/schedule.yaml#/ScheduleCollectionResponse'
+    ScheduleLogObject:
+      $ref: './schemas/schedule.yaml#/ScheduleLogObject'
+    ScheduleLogCollectionResponse:
+      $ref: './schemas/schedule.yaml#/ScheduleLogCollectionResponse'

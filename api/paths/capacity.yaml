@@ -1,0 +1,104 @@
+/api/capacity:
+  get:
+    tags:
+      - Capacity
+    summary: Get aggregate capacity
+    description: >
+      Returns aggregated workforce capacity metrics: total workers, active count,
+      throughput, utilization, and task queue depth.
+    operationId: getCapacity
+    responses:
+      '200':
+        description: Aggregate capacity metrics
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/capacity.yaml#/CapacityResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/capacity/forecast:
+  get:
+    tags:
+      - Capacity
+    summary: Forecast capacity
+    description: >
+      Returns a capacity forecast over a configurable horizon with an optional
+      growth rate applied to the current worker count.
+    operationId: forecastCapacity
+    parameters:
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 30
+          example: 30
+        description: Number of days to forecast
+      - name: growth_rate
+        in: query
+        required: false
+        schema:
+          type: number
+          format: float
+          default: 0
+          example: 0.05
+        description: Fractional growth rate to apply per day (e.g. 0.05 = 5%)
+    responses:
+      '200':
+        description: Capacity forecast
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/capacity.yaml#/CapacityForecastResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/capacity/workers:
+  get:
+    tags:
+      - Capacity
+    summary: Per-worker capacity stats
+    description: >
+      Returns capacity statistics broken down by individual worker: tasks
+      completed, queue depth, throughput, and utilization.
+    operationId: getWorkerCapacity
+    responses:
+      '200':
+        description: Per-worker capacity stats
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/capacity.yaml#/WorkerCapacityCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

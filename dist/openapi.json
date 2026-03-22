@@ -6465,6 +6465,723 @@
           }
         }
       }
+    },
+    "/api/capacity": {
+      "get": {
+        "tags": [
+          "Capacity"
+        ],
+        "summary": "Get aggregate capacity",
+        "description": "Returns aggregated workforce capacity metrics: total workers, active count, throughput, utilization, and task queue depth.\n",
+        "operationId": "getCapacity",
+        "responses": {
+          "200": {
+            "description": "Aggregate capacity metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/capacity/forecast": {
+      "get": {
+        "tags": [
+          "Capacity"
+        ],
+        "summary": "Forecast capacity",
+        "description": "Returns a capacity forecast over a configurable horizon with an optional growth rate applied to the current worker count.\n",
+        "operationId": "forecastCapacity",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "example": 30
+            },
+            "description": "Number of days to forecast"
+          },
+          {
+            "name": "growth_rate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "default": 0,
+              "example": 0.05
+            },
+            "description": "Fractional growth rate to apply per day (e.g. 0.05 = 5%)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Capacity forecast",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityForecastResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/capacity/workers": {
+      "get": {
+        "tags": [
+          "Capacity"
+        ],
+        "summary": "Per-worker capacity stats",
+        "description": "Returns capacity statistics broken down by individual worker: tasks completed, queue depth, throughput, and utilization.\n",
+        "operationId": "getWorkerCapacity",
+        "responses": {
+          "200": {
+            "description": "Per-worker capacity stats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerCapacityCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenants": {
+      "get": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "List tenants",
+        "description": "Returns all registered tenants.",
+        "operationId": "listTenants",
+        "responses": {
+          "200": {
+            "description": "Tenant list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Create a tenant",
+        "description": "Provisions a new tenant. Returns 409 if a tenant with the same tenant_id already exists.\n",
+        "operationId": "createTenant",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tenant created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Tenant already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenants/{tenant_id}": {
+      "get": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Get a tenant",
+        "description": "Returns a single tenant by tenant_id.",
+        "operationId": "getTenant",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "acme-corp"
+            },
+            "description": "Tenant identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenants/{tenant_id}/suspend": {
+      "post": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Suspend a tenant",
+        "description": "Suspends the specified tenant, halting all associated worker activity.",
+        "operationId": "suspendTenant",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "acme-corp"
+            },
+            "description": "Tenant identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant suspended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenants/{tenant_id}/quota/{resource}": {
+      "get": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Check tenant quota",
+        "description": "Returns quota usage and limits for the specified resource within a tenant.",
+        "operationId": "getTenantQuota",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "acme-corp"
+            },
+            "description": "Tenant identifier"
+          },
+          {
+            "name": "resource",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "workers"
+            },
+            "description": "Resource type to check quota for (e.g. workers, tasks)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quota status for the resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantQuotaResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/catalog": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "List extension catalog",
+        "description": "Returns a manifest for every loaded extension, including state, permissions (sandbox/read/write paths), runner definitions, and known MCP intents.\n",
+        "operationId": "listCatalog",
+        "responses": {
+          "200": {
+            "description": "Extension catalog list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/catalog/{name}": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Get catalog entry",
+        "description": "Returns the manifest for a single extension by gem name.",
+        "operationId": "getCatalogEntry",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "lex-node"
+            },
+            "description": "Extension gem name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Extension manifest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks": {
+      "get": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "List webhook subscriptions",
+        "description": "Returns all registered webhook subscriptions.",
+        "operationId": "listWebhooks",
+        "responses": {
+          "200": {
+            "description": "Webhook subscription list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Register a webhook",
+        "description": "Registers a new webhook subscription. The endpoint will receive HTTP POST requests for the specified event types, signed with HMAC using the provided secret.\n",
+        "operationId": "createWebhook",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Webhook registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks/{id}": {
+      "delete": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Delete a webhook",
+        "description": "Unregisters and removes the specified webhook subscription.",
+        "operationId": "deleteWebhook",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 42
+            },
+            "description": "Webhook subscription id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -9117,6 +9834,641 @@
           },
           "meta": {
             "$ref": "#/components/schemas/MetaCollection"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CapacityObject": {
+        "type": "object",
+        "properties": {
+          "total_workers": {
+            "type": "integer",
+            "description": "Total number of registered workers",
+            "example": 10
+          },
+          "active_workers": {
+            "type": "integer",
+            "description": "Number of currently active workers",
+            "example": 8
+          },
+          "throughput": {
+            "type": "number",
+            "format": "float",
+            "description": "Tasks completed per minute across all workers",
+            "example": 4.2
+          },
+          "utilization": {
+            "type": "number",
+            "format": "float",
+            "description": "Fraction of worker capacity currently in use (0.0–1.0)",
+            "example": 0.75
+          },
+          "queue_depth": {
+            "type": "integer",
+            "description": "Number of tasks currently waiting in the queue",
+            "example": 12
+          }
+        },
+        "required": [
+          "total_workers",
+          "active_workers",
+          "throughput",
+          "utilization",
+          "queue_depth"
+        ]
+      },
+      "CapacityResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CapacityObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CapacityForecastPoint": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "integer",
+            "description": "Day offset from today",
+            "example": 1
+          },
+          "projected_workers": {
+            "type": "number",
+            "format": "float",
+            "description": "Projected worker count after applying growth rate",
+            "example": 10.5
+          },
+          "projected_throughput": {
+            "type": "number",
+            "format": "float",
+            "description": "Projected throughput (tasks/min) for that day",
+            "example": 4.4
+          },
+          "projected_utilization": {
+            "type": "number",
+            "format": "float",
+            "description": "Projected utilization fraction for that day",
+            "example": 0.78
+          }
+        },
+        "required": [
+          "day",
+          "projected_workers",
+          "projected_throughput",
+          "projected_utilization"
+        ]
+      },
+      "CapacityForecastObject": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "integer",
+            "description": "Number of days in the forecast horizon",
+            "example": 30
+          },
+          "growth_rate": {
+            "type": "number",
+            "format": "float",
+            "description": "Growth rate applied per day",
+            "example": 0.05
+          },
+          "forecast": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CapacityForecastPoint"
+            }
+          }
+        },
+        "required": [
+          "days",
+          "growth_rate",
+          "forecast"
+        ]
+      },
+      "CapacityForecastResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CapacityForecastObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "WorkerCapacityObject": {
+        "type": "object",
+        "properties": {
+          "worker_id": {
+            "type": "string",
+            "description": "Worker identifier",
+            "example": "worker-abc123"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current lifecycle state of the worker",
+            "example": "active"
+          },
+          "tasks_completed": {
+            "type": "integer",
+            "description": "Total tasks completed by this worker",
+            "example": 142
+          },
+          "queue_depth": {
+            "type": "integer",
+            "description": "Number of tasks queued for this worker",
+            "example": 3
+          },
+          "throughput": {
+            "type": "number",
+            "format": "float",
+            "description": "Tasks per minute for this worker",
+            "example": 0.8
+          },
+          "utilization": {
+            "type": "number",
+            "format": "float",
+            "description": "Utilization fraction for this worker (0.0–1.0)",
+            "example": 0.6
+          }
+        },
+        "required": [
+          "worker_id",
+          "status",
+          "tasks_completed",
+          "queue_depth",
+          "throughput",
+          "utilization"
+        ]
+      },
+      "WorkerCapacityCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkerCapacityObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "TenantObject": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "description": "Unique tenant identifier",
+            "example": "acme-corp"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable tenant name",
+            "example": "Acme Corporation"
+          },
+          "max_workers": {
+            "type": "integer",
+            "description": "Maximum number of digital workers allowed for this tenant",
+            "example": 10
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Whether the tenant is currently suspended",
+            "example": false
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the tenant was created"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "name",
+          "max_workers",
+          "suspended"
+        ]
+      },
+      "TenantInput": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "description": "Unique tenant identifier",
+            "example": "acme-corp"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable tenant name",
+            "example": "Acme Corporation"
+          },
+          "max_workers": {
+            "type": "integer",
+            "description": "Maximum number of digital workers allowed (default 10)",
+            "default": 10,
+            "example": 10
+          }
+        },
+        "required": [
+          "tenant_id",
+          "name"
+        ]
+      },
+      "TenantResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TenantObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "TenantCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TenantObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "TenantQuotaObject": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "description": "Tenant identifier",
+            "example": "acme-corp"
+          },
+          "resource": {
+            "type": "string",
+            "description": "Resource type being checked",
+            "example": "workers"
+          },
+          "used": {
+            "type": "integer",
+            "description": "Current usage count for this resource",
+            "example": 4
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum allowed for this resource",
+            "example": 10
+          },
+          "available": {
+            "type": "integer",
+            "description": "Remaining capacity (limit - used)",
+            "example": 6
+          },
+          "exceeded": {
+            "type": "boolean",
+            "description": "Whether the quota has been exceeded",
+            "example": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "resource",
+          "used",
+          "limit",
+          "available",
+          "exceeded"
+        ]
+      },
+      "TenantQuotaResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TenantQuotaObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CatalogPermissionsObject": {
+        "type": "object",
+        "properties": {
+          "sandbox": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Sandbox root path granted to this extension",
+            "example": "/tmp/legion/lex-node"
+          },
+          "read_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filesystem paths this extension may read",
+            "example": [
+              "/etc/legionio"
+            ]
+          },
+          "write_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filesystem paths this extension may write",
+            "example": [
+              "/var/log/legionio"
+            ]
+          }
+        },
+        "required": [
+          "read_paths",
+          "write_paths"
+        ]
+      },
+      "CatalogRunnerMethodObject": {
+        "type": "object",
+        "properties": {
+          "methods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Function names exposed by this runner",
+            "example": [
+              "ping",
+              "status"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Human-readable runner description",
+            "example": "Core node identity runner"
+          }
+        },
+        "required": [
+          "methods"
+        ]
+      },
+      "CatalogKnownIntentObject": {
+        "type": "object",
+        "properties": {
+          "intent": {
+            "type": "string",
+            "description": "Natural language intent text matched to this extension",
+            "example": "check node health"
+          },
+          "tool_chain": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ordered list of tool identifiers in the matched chain",
+            "example": [
+              "lex-node.node.ping"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "format": "float",
+            "description": "Pattern match confidence score (0.0–1.0)",
+            "example": 0.92
+          }
+        },
+        "required": [
+          "intent",
+          "tool_chain",
+          "confidence"
+        ]
+      },
+      "CatalogEntryObject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Extension gem name",
+            "example": "lex-node"
+          },
+          "state": {
+            "type": "string",
+            "description": "Current lifecycle state of the extension",
+            "example": "running"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when the extension started"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/CatalogPermissionsObject"
+          },
+          "runners": {
+            "type": "object",
+            "description": "Map of runner name to runner metadata. Keys are runner names, values contain methods and an optional description.\n",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CatalogRunnerMethodObject"
+            }
+          },
+          "known_intents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogKnownIntentObject"
+            },
+            "description": "MCP pattern store intents that route to this extension"
+          }
+        },
+        "required": [
+          "name",
+          "state",
+          "permissions",
+          "runners",
+          "known_intents"
+        ]
+      },
+      "CatalogEntryResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CatalogEntryObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CatalogCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogEntryObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "WebhookObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Webhook subscription id",
+            "example": 42
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Endpoint URL that receives event deliveries",
+            "example": "https://example.com/hooks/legion"
+          },
+          "event_types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of event type patterns to subscribe to. Use '*' to receive all events.\n",
+            "example": [
+              "task.completed",
+              "worker.lifecycle"
+            ]
+          },
+          "max_retries": {
+            "type": "integer",
+            "description": "Maximum number of delivery retry attempts on failure",
+            "example": 5
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the webhook was registered"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "event_types",
+          "max_retries"
+        ]
+      },
+      "WebhookInput": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Endpoint URL to deliver events to",
+            "example": "https://example.com/hooks/legion"
+          },
+          "secret": {
+            "type": "string",
+            "description": "HMAC signing secret. Deliveries include an X-Legion-Signature header computed with this secret.\n",
+            "example": "s3cr3t-k3y"
+          },
+          "event_types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Event type patterns to subscribe to. Defaults to ['*'] (all events).\n",
+            "default": [
+              "*"
+            ],
+            "example": [
+              "task.completed",
+              "worker.lifecycle"
+            ]
+          },
+          "max_retries": {
+            "type": "integer",
+            "description": "Maximum delivery retry attempts. Defaults to 5.",
+            "default": 5,
+            "example": 5
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "WebhookResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WebhookObject"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "WebhookCollectionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebhookObject"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
           }
         },
         "required": [

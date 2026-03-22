@@ -1,0 +1,127 @@
+CatalogPermissionsObject:
+  type: object
+  properties:
+    sandbox:
+      type:
+        - string
+        - 'null'
+      description: Sandbox root path granted to this extension
+      example: /tmp/legion/lex-node
+    read_paths:
+      type: array
+      items:
+        type: string
+      description: Filesystem paths this extension may read
+      example: ['/etc/legionio']
+    write_paths:
+      type: array
+      items:
+        type: string
+      description: Filesystem paths this extension may write
+      example: ['/var/log/legionio']
+  required:
+    - read_paths
+    - write_paths
+
+CatalogRunnerMethodObject:
+  type: object
+  properties:
+    methods:
+      type: array
+      items:
+        type: string
+      description: Function names exposed by this runner
+      example: ['ping', 'status']
+    description:
+      type:
+        - string
+        - 'null'
+      description: Human-readable runner description
+      example: Core node identity runner
+  required:
+    - methods
+
+CatalogKnownIntentObject:
+  type: object
+  properties:
+    intent:
+      type: string
+      description: Natural language intent text matched to this extension
+      example: check node health
+    tool_chain:
+      type: array
+      items:
+        type: string
+      description: Ordered list of tool identifiers in the matched chain
+      example: ['lex-node.node.ping']
+    confidence:
+      type: number
+      format: float
+      description: Pattern match confidence score (0.0–1.0)
+      example: 0.92
+  required:
+    - intent
+    - tool_chain
+    - confidence
+
+CatalogEntryObject:
+  type: object
+  properties:
+    name:
+      type: string
+      description: Extension gem name
+      example: lex-node
+    state:
+      type: string
+      description: Current lifecycle state of the extension
+      example: running
+    started_at:
+      type:
+        - string
+        - 'null'
+      format: date-time
+      description: ISO 8601 timestamp when the extension started
+    permissions:
+      $ref: './catalog.yaml#/CatalogPermissionsObject'
+    runners:
+      type: object
+      description: >
+        Map of runner name to runner metadata. Keys are runner names,
+        values contain methods and an optional description.
+      additionalProperties:
+        $ref: './catalog.yaml#/CatalogRunnerMethodObject'
+    known_intents:
+      type: array
+      items:
+        $ref: './catalog.yaml#/CatalogKnownIntentObject'
+      description: MCP pattern store intents that route to this extension
+  required:
+    - name
+    - state
+    - permissions
+    - runners
+    - known_intents
+
+CatalogEntryResponse:
+  type: object
+  properties:
+    data:
+      $ref: './catalog.yaml#/CatalogEntryObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+CatalogCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './catalog.yaml#/CatalogEntryObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta

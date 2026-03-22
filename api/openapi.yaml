@@ -244,6 +244,32 @@ paths:
   /api/governance/approvals/{id}/reject:
     $ref: './paths/governance.yaml#/~1api~1governance~1approvals~1{id}~1reject'
 
+  /api/capacity:
+    $ref: './paths/capacity.yaml#/~1api~1capacity'
+  /api/capacity/forecast:
+    $ref: './paths/capacity.yaml#/~1api~1capacity~1forecast'
+  /api/capacity/workers:
+    $ref: './paths/capacity.yaml#/~1api~1capacity~1workers'
+
+  /api/tenants:
+    $ref: './paths/tenants.yaml#/~1api~1tenants'
+  /api/tenants/{tenant_id}:
+    $ref: './paths/tenants.yaml#/~1api~1tenants~1{tenant_id}'
+  /api/tenants/{tenant_id}/suspend:
+    $ref: './paths/tenants.yaml#/~1api~1tenants~1{tenant_id}~1suspend'
+  /api/tenants/{tenant_id}/quota/{resource}:
+    $ref: './paths/tenants.yaml#/~1api~1tenants~1{tenant_id}~1quota~1{resource}'
+
+  /api/catalog:
+    $ref: './paths/catalog.yaml#/~1api~1catalog'
+  /api/catalog/{name}:
+    $ref: './paths/catalog.yaml#/~1api~1catalog~1{name}'
+
+  /api/webhooks:
+    $ref: './paths/webhooks.yaml#/~1api~1webhooks'
+  /api/webhooks/{id}:
+    $ref: './paths/webhooks.yaml#/~1api~1webhooks~1{id}'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -494,3 +520,57 @@ components:
       $ref: './schemas/governance.yaml#/ApprovalResponse'
     ApprovalCollectionResponse:
       $ref: './schemas/governance.yaml#/ApprovalCollectionResponse'
+
+    # Capacity schemas
+    CapacityObject:
+      $ref: './schemas/capacity.yaml#/CapacityObject'
+    CapacityResponse:
+      $ref: './schemas/capacity.yaml#/CapacityResponse'
+    CapacityForecastPoint:
+      $ref: './schemas/capacity.yaml#/CapacityForecastPoint'
+    CapacityForecastObject:
+      $ref: './schemas/capacity.yaml#/CapacityForecastObject'
+    CapacityForecastResponse:
+      $ref: './schemas/capacity.yaml#/CapacityForecastResponse'
+    WorkerCapacityObject:
+      $ref: './schemas/capacity.yaml#/WorkerCapacityObject'
+    WorkerCapacityCollectionResponse:
+      $ref: './schemas/capacity.yaml#/WorkerCapacityCollectionResponse'
+
+    # Tenant schemas
+    TenantObject:
+      $ref: './schemas/tenant.yaml#/TenantObject'
+    TenantInput:
+      $ref: './schemas/tenant.yaml#/TenantInput'
+    TenantResponse:
+      $ref: './schemas/tenant.yaml#/TenantResponse'
+    TenantCollectionResponse:
+      $ref: './schemas/tenant.yaml#/TenantCollectionResponse'
+    TenantQuotaObject:
+      $ref: './schemas/tenant.yaml#/TenantQuotaObject'
+    TenantQuotaResponse:
+      $ref: './schemas/tenant.yaml#/TenantQuotaResponse'
+
+    # Catalog schemas
+    CatalogPermissionsObject:
+      $ref: './schemas/catalog.yaml#/CatalogPermissionsObject'
+    CatalogRunnerMethodObject:
+      $ref: './schemas/catalog.yaml#/CatalogRunnerMethodObject'
+    CatalogKnownIntentObject:
+      $ref: './schemas/catalog.yaml#/CatalogKnownIntentObject'
+    CatalogEntryObject:
+      $ref: './schemas/catalog.yaml#/CatalogEntryObject'
+    CatalogEntryResponse:
+      $ref: './schemas/catalog.yaml#/CatalogEntryResponse'
+    CatalogCollectionResponse:
+      $ref: './schemas/catalog.yaml#/CatalogCollectionResponse'
+
+    # Webhook schemas
+    WebhookObject:
+      $ref: './schemas/webhook.yaml#/WebhookObject'
+    WebhookInput:
+      $ref: './schemas/webhook.yaml#/WebhookInput'
+    WebhookResponse:
+      $ref: './schemas/webhook.yaml#/WebhookResponse'
+    WebhookCollectionResponse:
+      $ref: './schemas/webhook.yaml#/WebhookCollectionResponse'

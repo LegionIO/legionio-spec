@@ -1,0 +1,196 @@
+/api/tenants:
+  get:
+    tags:
+      - Tenants
+    summary: List tenants
+    description: Returns all registered tenants.
+    operationId: listTenants
+    responses:
+      '200':
+        description: Tenant list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/tenant.yaml#/TenantCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - Tenants
+    summary: Create a tenant
+    description: >
+      Provisions a new tenant. Returns 409 if a tenant with the same tenant_id
+      already exists.
+    operationId: createTenant
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/tenant.yaml#/TenantInput'
+    responses:
+      '201':
+        description: Tenant created
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/tenant.yaml#/TenantResponse'
+      '409':
+        description: Tenant already exists
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/tenants/{tenant_id}:
+  get:
+    tags:
+      - Tenants
+    summary: Get a tenant
+    description: Returns a single tenant by tenant_id.
+    operationId: getTenant
+    parameters:
+      - name: tenant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: acme-corp
+        description: Tenant identifier
+    responses:
+      '200':
+        description: Tenant detail
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/tenant.yaml#/TenantResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Tenant not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/tenants/{tenant_id}/suspend:
+  post:
+    tags:
+      - Tenants
+    summary: Suspend a tenant
+    description: Suspends the specified tenant, halting all associated worker activity.
+    operationId: suspendTenant
+    parameters:
+      - name: tenant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: acme-corp
+        description: Tenant identifier
+    responses:
+      '200':
+        description: Tenant suspended
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/tenant.yaml#/TenantResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Tenant not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/tenants/{tenant_id}/quota/{resource}:
+  get:
+    tags:
+      - Tenants
+    summary: Check tenant quota
+    description: Returns quota usage and limits for the specified resource within a tenant.
+    operationId: getTenantQuota
+    parameters:
+      - name: tenant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: acme-corp
+        description: Tenant identifier
+      - name: resource
+        in: path
+        required: true
+        schema:
+          type: string
+          example: workers
+        description: Resource type to check quota for (e.g. workers, tasks)
+    responses:
+      '200':
+        description: Quota status for the resource
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/tenant.yaml#/TenantQuotaResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Tenant not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

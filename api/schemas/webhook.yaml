@@ -1,0 +1,87 @@
+WebhookObject:
+  type: object
+  properties:
+    id:
+      type: integer
+      description: Webhook subscription id
+      example: 42
+    url:
+      type: string
+      format: uri
+      description: Endpoint URL that receives event deliveries
+      example: https://example.com/hooks/legion
+    event_types:
+      type: array
+      items:
+        type: string
+      description: >
+        List of event type patterns to subscribe to. Use '*' to receive all events.
+      example: ['task.completed', 'worker.lifecycle']
+    max_retries:
+      type: integer
+      description: Maximum number of delivery retry attempts on failure
+      example: 5
+    created_at:
+      type: string
+      format: date-time
+      description: Timestamp when the webhook was registered
+  required:
+    - id
+    - url
+    - event_types
+    - max_retries
+
+WebhookInput:
+  type: object
+  properties:
+    url:
+      type: string
+      format: uri
+      description: Endpoint URL to deliver events to
+      example: https://example.com/hooks/legion
+    secret:
+      type: string
+      description: >
+        HMAC signing secret. Deliveries include an X-Legion-Signature header
+        computed with this secret.
+      example: s3cr3t-k3y
+    event_types:
+      type: array
+      items:
+        type: string
+      description: >
+        Event type patterns to subscribe to. Defaults to ['*'] (all events).
+      default:
+        - '*'
+      example: ['task.completed', 'worker.lifecycle']
+    max_retries:
+      type: integer
+      description: Maximum delivery retry attempts. Defaults to 5.
+      default: 5
+      example: 5
+  required:
+    - url
+
+WebhookResponse:
+  type: object
+  properties:
+    data:
+      $ref: './webhook.yaml#/WebhookObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+WebhookCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './webhook.yaml#/WebhookObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta

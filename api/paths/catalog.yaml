@@ -1,0 +1,70 @@
+/api/catalog:
+  get:
+    tags:
+      - Catalog
+    summary: List extension catalog
+    description: >
+      Returns a manifest for every loaded extension, including state,
+      permissions (sandbox/read/write paths), runner definitions, and
+      known MCP intents.
+    operationId: listCatalog
+    responses:
+      '200':
+        description: Extension catalog list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/catalog.yaml#/CatalogCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/catalog/{name}:
+  get:
+    tags:
+      - Catalog
+    summary: Get catalog entry
+    description: Returns the manifest for a single extension by gem name.
+    operationId: getCatalogEntry
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          example: lex-node
+        description: Extension gem name
+    responses:
+      '200':
+        description: Extension manifest
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/catalog.yaml#/CatalogEntryResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Extension not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

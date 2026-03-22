@@ -1,0 +1,152 @@
+CapacityObject:
+  type: object
+  properties:
+    total_workers:
+      type: integer
+      description: Total number of registered workers
+      example: 10
+    active_workers:
+      type: integer
+      description: Number of currently active workers
+      example: 8
+    throughput:
+      type: number
+      format: float
+      description: Tasks completed per minute across all workers
+      example: 4.2
+    utilization:
+      type: number
+      format: float
+      description: Fraction of worker capacity currently in use (0.0–1.0)
+      example: 0.75
+    queue_depth:
+      type: integer
+      description: Number of tasks currently waiting in the queue
+      example: 12
+  required:
+    - total_workers
+    - active_workers
+    - throughput
+    - utilization
+    - queue_depth
+
+CapacityResponse:
+  type: object
+  properties:
+    data:
+      $ref: './capacity.yaml#/CapacityObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+CapacityForecastPoint:
+  type: object
+  properties:
+    day:
+      type: integer
+      description: Day offset from today
+      example: 1
+    projected_workers:
+      type: number
+      format: float
+      description: Projected worker count after applying growth rate
+      example: 10.5
+    projected_throughput:
+      type: number
+      format: float
+      description: Projected throughput (tasks/min) for that day
+      example: 4.4
+    projected_utilization:
+      type: number
+      format: float
+      description: Projected utilization fraction for that day
+      example: 0.78
+  required:
+    - day
+    - projected_workers
+    - projected_throughput
+    - projected_utilization
+
+CapacityForecastObject:
+  type: object
+  properties:
+    days:
+      type: integer
+      description: Number of days in the forecast horizon
+      example: 30
+    growth_rate:
+      type: number
+      format: float
+      description: Growth rate applied per day
+      example: 0.05
+    forecast:
+      type: array
+      items:
+        $ref: './capacity.yaml#/CapacityForecastPoint'
+  required:
+    - days
+    - growth_rate
+    - forecast
+
+CapacityForecastResponse:
+  type: object
+  properties:
+    data:
+      $ref: './capacity.yaml#/CapacityForecastObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+WorkerCapacityObject:
+  type: object
+  properties:
+    worker_id:
+      type: string
+      description: Worker identifier
+      example: worker-abc123
+    status:
+      type: string
+      description: Current lifecycle state of the worker
+      example: active
+    tasks_completed:
+      type: integer
+      description: Total tasks completed by this worker
+      example: 142
+    queue_depth:
+      type: integer
+      description: Number of tasks queued for this worker
+      example: 3
+    throughput:
+      type: number
+      format: float
+      description: Tasks per minute for this worker
+      example: 0.8
+    utilization:
+      type: number
+      format: float
+      description: Utilization fraction for this worker (0.0–1.0)
+      example: 0.6
+  required:
+    - worker_id
+    - status
+    - tasks_completed
+    - queue_depth
+    - throughput
+    - utilization
+
+WorkerCapacityCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './capacity.yaml#/WorkerCapacityObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta

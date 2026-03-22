@@ -1,0 +1,118 @@
+TenantObject:
+  type: object
+  properties:
+    tenant_id:
+      type: string
+      description: Unique tenant identifier
+      example: acme-corp
+    name:
+      type: string
+      description: Human-readable tenant name
+      example: Acme Corporation
+    max_workers:
+      type: integer
+      description: Maximum number of digital workers allowed for this tenant
+      example: 10
+    suspended:
+      type: boolean
+      description: Whether the tenant is currently suspended
+      example: false
+    created_at:
+      type: string
+      format: date-time
+      description: Timestamp when the tenant was created
+  required:
+    - tenant_id
+    - name
+    - max_workers
+    - suspended
+
+TenantInput:
+  type: object
+  properties:
+    tenant_id:
+      type: string
+      description: Unique tenant identifier
+      example: acme-corp
+    name:
+      type: string
+      description: Human-readable tenant name
+      example: Acme Corporation
+    max_workers:
+      type: integer
+      description: Maximum number of digital workers allowed (default 10)
+      default: 10
+      example: 10
+  required:
+    - tenant_id
+    - name
+
+TenantResponse:
+  type: object
+  properties:
+    data:
+      $ref: './tenant.yaml#/TenantObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+TenantCollectionResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        $ref: './tenant.yaml#/TenantObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta
+
+TenantQuotaObject:
+  type: object
+  properties:
+    tenant_id:
+      type: string
+      description: Tenant identifier
+      example: acme-corp
+    resource:
+      type: string
+      description: Resource type being checked
+      example: workers
+    used:
+      type: integer
+      description: Current usage count for this resource
+      example: 4
+    limit:
+      type: integer
+      description: Maximum allowed for this resource
+      example: 10
+    available:
+      type: integer
+      description: Remaining capacity (limit - used)
+      example: 6
+    exceeded:
+      type: boolean
+      description: Whether the quota has been exceeded
+      example: false
+  required:
+    - tenant_id
+    - resource
+    - used
+    - limit
+    - available
+    - exceeded
+
+TenantQuotaResponse:
+  type: object
+  properties:
+    data:
+      $ref: './tenant.yaml#/TenantQuotaObject'
+    meta:
+      $ref: './common.yaml#/Meta'
+  required:
+    - data
+    - meta

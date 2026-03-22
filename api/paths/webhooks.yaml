@@ -1,0 +1,102 @@
+/api/webhooks:
+  get:
+    tags:
+      - Webhooks
+    summary: List webhook subscriptions
+    description: Returns all registered webhook subscriptions.
+    operationId: listWebhooks
+    responses:
+      '200':
+        description: Webhook subscription list
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/webhook.yaml#/WebhookCollectionResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+  post:
+    tags:
+      - Webhooks
+    summary: Register a webhook
+    description: >
+      Registers a new webhook subscription. The endpoint will receive HTTP POST
+      requests for the specified event types, signed with HMAC using the provided
+      secret.
+    operationId: createWebhook
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/webhook.yaml#/WebhookInput'
+    responses:
+      '201':
+        description: Webhook registered
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/webhook.yaml#/WebhookResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/webhooks/{id}:
+  delete:
+    tags:
+      - Webhooks
+    summary: Delete a webhook
+    description: Unregisters and removes the specified webhook subscription.
+    operationId: deleteWebhook
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 42
+        description: Webhook subscription id
+    responses:
+      '200':
+        description: Webhook deleted
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/DeletedResponse'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '404':
+        description: Webhook not found
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

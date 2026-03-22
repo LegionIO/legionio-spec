@@ -1,0 +1,120 @@
+/api/lex:
+  get:
+    tags:
+      - Lex
+    summary: List LEX auto-routes
+    description: >
+      Returns all auto-registered LEX runner routes. Each entry maps a URL path to the
+      extension, runner, and function that will handle POST requests to that path.
+      Routes are registered automatically by Builders::Routes during extension autobuild.
+    operationId: getLexRoutes
+    responses:
+      '200':
+        description: Registered LEX route list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      endpoint:
+                        type: string
+                        example: /api/lex/github/sync
+                      extension:
+                        type: string
+                        example: lex-github
+                      runner:
+                        type: string
+                        example: Sync
+                      function:
+                        type: string
+                        example: repositories
+                      runner_class:
+                        type: string
+                        example: Legion::Extensions::Github::Runners::Sync
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+
+/api/lex/{path}:
+  post:
+    tags:
+      - Lex
+    summary: Invoke LEX runner
+    description: >
+      Dispatches a payload to the LEX runner registered at the given path.
+      The path parameter captures the full route_path for the runner function
+      (e.g. github/sync/repositories). The request body is passed as the runner
+      payload via Legion::Ingress.
+      Returns 404 if no route is registered for the given path.
+      On success, returns the task_id, status, and result (if available synchronously).
+    operationId: invokeLexRunner
+    parameters:
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+          example: github/sync/repositories
+        description: >
+          Full route path for the target LEX runner function.
+          Format is typically extension/runner/function.
+    requestBody:
+      required: false
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+            description: >
+              Arbitrary payload passed to the runner function. Structure is
+              runner-specific. Empty body is valid; an empty hash is used.
+    responses:
+      '200':
+        description: Runner dispatched
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    task_id:
+                      type: integer
+                      example: 4822
+                    status:
+                      type: string
+                      example: queued
+                    result:
+                      description: Synchronous result if available; omitted when async
+                      type: ['object', 'string', 'number', 'boolean', 'null']
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '404':
+        description: No route registered for path
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/common.yaml#/ErrorResponse'

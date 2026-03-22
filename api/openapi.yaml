@@ -183,6 +183,16 @@ paths:
   /api/teams/{team}/costs:
     $ref: './paths/teams.yaml#/~1api~1teams~1{team}~1costs'
 
+  /api/hooks:
+    $ref: './paths/hooks.yaml#/~1api~1hooks'
+  /api/hooks/lex/{path}:
+    $ref: './paths/hooks.yaml#/~1api~1hooks~1lex~1{path}'
+
+  /api/lex:
+    $ref: './paths/lex.yaml#/~1api~1lex'
+  /api/lex/{path}:
+    $ref: './paths/lex.yaml#/~1api~1lex~1{path}'
+
 components:
   securitySchemes:
     BearerAuth:

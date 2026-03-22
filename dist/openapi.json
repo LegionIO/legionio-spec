@@ -3918,6 +3918,448 @@
           }
         }
       }
+    },
+    "/api/hooks": {
+      "get": {
+        "tags": [
+          "Hooks"
+        ],
+        "summary": "List registered hooks",
+        "description": "Returns all extension webhook hooks registered with the Legion API. Each entry includes the extension name, hook name, hook class, default runner, and the trigger endpoint path.\n",
+        "operationId": "listHooks",
+        "responses": {
+          "200": {
+            "description": "Registered hook list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "lex_name": {
+                            "type": "string",
+                            "example": "lex-github"
+                          },
+                          "hook_name": {
+                            "type": "string",
+                            "example": "github_webhook"
+                          },
+                          "hook_class": {
+                            "type": "string",
+                            "example": "Legion::Extensions::Github::Hooks::GithubWebhook"
+                          },
+                          "default_runner": {
+                            "type": "string",
+                            "example": "Legion::Extensions::Github::Runners::Events"
+                          },
+                          "route_path": {
+                            "type": "string",
+                            "example": "github/events"
+                          },
+                          "endpoint": {
+                            "type": "string",
+                            "example": "/api/hooks/lex/github/events"
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/hooks/lex/{path}": {
+      "get": {
+        "tags": [
+          "Hooks"
+        ],
+        "summary": "Trigger hook via GET",
+        "description": "Dispatches a registered extension hook using a GET request. The path parameter captures the full route_path registered by the extension (e.g. github/events). Returns 404 if no hook is registered for the given path. Returns 401 if hook verification fails. Returns 422 if the hook cannot route the event. Returns 500 if no runner class is configured. On success, returns the task_id and status from the dispatched Ingress run.\n",
+        "operationId": "triggerHookGet",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "github/events"
+            },
+            "description": "Hook route path registered by the extension"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hook dispatched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "task_id": {
+                          "type": "integer",
+                          "example": 4821
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "queued"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Hook verification failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No hook registered for path",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Hook could not route this event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "No runner configured or internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hooks"
+        ],
+        "summary": "Trigger hook via POST",
+        "description": "Dispatches a registered extension hook using a POST request. The path parameter captures the full route_path registered by the extension (e.g. github/events). The request body is read as the hook payload and passed to the hook class for verification and routing. Returns 404 if no hook is registered for the given path. Returns 401 if hook verification fails. Returns 422 if the hook cannot route the event. Returns 500 if no runner class is configured. On success, returns the task_id and status from the dispatched Ingress run.\n",
+        "operationId": "triggerHook",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "github/events"
+            },
+            "description": "Hook route path registered by the extension"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Arbitrary hook payload; structure is hook-specific"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Hook dispatched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "task_id": {
+                          "type": "integer",
+                          "example": 4821
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "queued"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Hook verification failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No hook registered for path",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Hook could not route this event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "No runner configured or internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lex": {
+      "get": {
+        "tags": [
+          "Lex"
+        ],
+        "summary": "List LEX auto-routes",
+        "description": "Returns all auto-registered LEX runner routes. Each entry maps a URL path to the extension, runner, and function that will handle POST requests to that path. Routes are registered automatically by Builders::Routes during extension autobuild.\n",
+        "operationId": "getLexRoutes",
+        "responses": {
+          "200": {
+            "description": "Registered LEX route list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "endpoint": {
+                            "type": "string",
+                            "example": "/api/lex/github/sync"
+                          },
+                          "extension": {
+                            "type": "string",
+                            "example": "lex-github"
+                          },
+                          "runner": {
+                            "type": "string",
+                            "example": "Sync"
+                          },
+                          "function": {
+                            "type": "string",
+                            "example": "repositories"
+                          },
+                          "runner_class": {
+                            "type": "string",
+                            "example": "Legion::Extensions::Github::Runners::Sync"
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lex/{path}": {
+      "post": {
+        "tags": [
+          "Lex"
+        ],
+        "summary": "Invoke LEX runner",
+        "description": "Dispatches a payload to the LEX runner registered at the given path. The path parameter captures the full route_path for the runner function (e.g. github/sync/repositories). The request body is passed as the runner payload via Legion::Ingress. Returns 404 if no route is registered for the given path. On success, returns the task_id, status, and result (if available synchronously).\n",
+        "operationId": "invokeLexRunner",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "github/sync/repositories"
+            },
+            "description": "Full route path for the target LEX runner function. Format is typically extension/runner/function.\n"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Arbitrary payload passed to the runner function. Structure is runner-specific. Empty body is valid; an empty hash is used.\n"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Runner dispatched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "task_id": {
+                          "type": "integer",
+                          "example": 4822
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "queued"
+                        },
+                        "result": {
+                          "description": "Synchronous result if available; omitted when async",
+                          "type": [
+                            "object",
+                            "string",
+                            "number",
+                            "boolean",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No route registered for path",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
